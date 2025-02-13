@@ -1,0 +1,142 @@
+@model StorkDorkMain.Models.Sighting
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Log a Bird Sighting</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit" id="sightingForm">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+
+            <!-- Bird Species Dropdown -->
+            <div class="form-group">
+                <label asp-for="BirdId" class="control-label">Bird Species</label>
+                <select asp-for="BirdId" class="form-control" asp-items="ViewBag.BirdId">
+                    <option value="">-- Select Bird --</option>
+                    <option value="0">N/A</option>
+                </select>
+                <span asp-validation-for="BirdId" class="text-danger"></span>
+            </div>
+             <!-- Hidden inputs for Latitude and Longitude -->
+            <input type="hidden" asp-for="Latitude" id="LatitudeInput" />
+            <input type="hidden" asp-for="Longitude" id="LongitudeInput" />
+
+            <!-- Location Dropdown -->
+            <div class="form-group">
+                <label for="PnwLocation">Select a Location</label>
+                <select id="PnwLocation" class="form-control" name="PnwLocation">
+                    <option value="">-- Select Location --</option>
+                    <option value="0">N/A</option>
+                    @foreach (var location in ViewBag.PnwLocations)
+                    {
+                        <option value="@location.Value" data-latlong="@location.Value" selected="@(location.Value == ViewBag.SelectedLatLong)">@location.Text</option>
+                    }
+                </select>
+                <span id="locationError" class="text-danger"></span>
+            </div>
+
+           
+
+            <!-- Date Input -->
+            <div class="form-group">
+                <label asp-for="Date" class="control-label">Date</label>
+                <input asp-for="Date" class="form-control" type="date" />
+                <span asp-validation-for="Date" class="text-danger"></span>
+            </div>
+
+            <!-- Notes Textarea -->
+            <div class="form-group">
+                <label asp-for="Notes" class="control-label">Additional Notes</label>
+                <textarea asp-for="Notes" class="form-control"placeholder="Example: Saw a strange looking bird. Weather was sunny and calm."></textarea>
+                <span asp-validation-for="Notes" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Weather Conditions (Suggestions)</label>
+                <div class="border p-3 rounded bg-light">
+                    <!-- Sky Conditions -->
+                    <strong>🌤️ Sky Conditions:</strong>
+                    <ul class="list-unstyled">
+                        <li>• Sunny</li>
+                        <li>• Partly Cloudy</li>
+                        <li>• Overcast</li>
+                    </ul>
+
+                    <!-- Precipitation -->
+                    <strong>🌧️ Precipitation:</strong>
+                    <ul class="list-unstyled">
+                        <li>• Drizzle</li>
+                        <li>• Rain</li>
+                        <li>• Thunderstorm</li>
+                        <li>• Snow</li>
+                    </ul>
+
+                    <!-- Wind Conditions -->
+                    <strong>💨 Wind Conditions:</strong>
+                    <ul class="list-unstyled">
+                        <li>• Calm</li>
+                        <li>• Windy</li>
+                    </ul>
+                </div>
+                <small class="text-muted">These are suggestions for your notes. Feel free to include them!</small>
+            </div>
+
+            
+
+            <!-- Submit Button -->
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var latitude = parseFloat(document.getElementById('LatitudeInput').value);
+            var longitude = parseFloat(document.getElementById('LongitudeInput').value);
+
+            console.log(`Latitude: ${latitude}, Longitude: ${longitude}`); // Debugging
+
+            var locationDropdown = document.getElementById('PnwLocation');
+            for (var i = 0; i < locationDropdown.options.length; i++) {
+                var optionLatLong = locationDropdown.options[i].getAttribute('data-latlong');
+                if (optionLatLong) {
+                    var [optionLat, optionLong] = optionLatLong.split(',').map(parseFloat);
+
+                    // Compare latitude and longitude with a small tolerance for precision differences
+                    if (Math.abs(optionLat - latitude) < 0.0001 && Math.abs(optionLong - longitude) < 0.0001) {
+                        locationDropdown.selectedIndex = i;
+                        console.log(`Selected Option: ${locationDropdown.options[i].text}`); // Debugging
+                        break;
+                    }
+                }
+            }
+
+            // Update hidden fields when a new location is selected
+            locationDropdown.addEventListener('change', function () {
+                var selectedOption = this.options[this.selectedIndex];
+                var latLong = selectedOption.getAttribute('data-latlong');
+                if (latLong) {
+                    var [latitude, longitude] = latLong.split(',');
+                    document.getElementById('LatitudeInput').value = latitude;
+                    document.getElementById('LongitudeInput').value = longitude;
+                } else {
+                    document.getElementById('LatitudeInput').value = '';
+                    document.getElementById('LongitudeInput').value = '';
+                }
+            });
+        });
+    </script>
+}

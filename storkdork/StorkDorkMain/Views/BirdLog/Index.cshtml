@@ -1,0 +1,76 @@
+@model IEnumerable<StorkDorkMain.Models.Sighting>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Bird Sightings</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Log New Sighting</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.SduserId)</th>
+            <th>@Html.DisplayNameFor(model => model.Date)</th>
+            <th>@Html.DisplayNameFor(model => model.Bird)</th>
+            <th>PNW Location</th>
+            <th>User Notes</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model) {
+        <tr>
+            <td>@Html.DisplayFor(modelItem => item.SduserId)</td>
+            <td>@Html.DisplayFor(modelItem => item.Date)</td>
+            <td>
+                @if (item.Bird == null)
+                {
+                    <text>Bird Species Unavailable</text>
+                }
+                else
+                {
+                   @Html.DisplayFor(modelItem => item.Bird.CommonName) 
+                }
+            </td>
+            <td>
+                @{
+                    string latitude = item.Latitude?.ToString("0.0000") ?? "NULL";
+                    string longitude = item.Longitude?.ToString("0.0000") ?? "NULL";
+                    string locationKey = $"{latitude},{longitude}";
+
+                    string locationName = (latitude != "NULL" && longitude != "NULL" && ViewBag.PnwLocations.ContainsKey(locationKey))
+                        ? ViewBag.PnwLocations[locationKey]
+                        : "Location Not Available";
+                }
+                <strong>@locationName</strong> <br>
+                <small>Debug: @locationKey</small>
+            </td>
+            <td>
+                @if (string.IsNullOrEmpty(item.Notes))
+                {
+                    <text>There were no notes recorded.</text>
+                }
+                else
+                {
+                    @item.Notes
+                }
+            </td>
+            
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edit</a>
+                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Details</a>
+                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Delete</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/sorting.js"></script>
+}

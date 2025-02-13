@@ -1,0 +1,150 @@
+@model StorkDorkMain.Models.Sighting
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Log a Bird Sighting</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" id="sightingForm">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- Bird Species Dropdown -->
+            <div class="form-group">
+                <label asp-for="BirdId" class="control-label">Bird Species</label>
+                <select asp-for="BirdId" class="form-control" asp-items="ViewBag.BirdId">
+                    <option value="">-- Select Bird --</option>
+                    <option value="0">N/A</option>
+                </select>
+                <span asp-validation-for="BirdId" class="text-danger"></span>
+            </div>
+
+            <!-- Location Dropdown -->
+            <div class="form-group">
+                <label for="PnwLocation">Select a Location</label>
+                <select id="PnwLocation" class="form-control" name="PnwLocation">
+                    <option value="">-- Select Location --</option>
+                    <option value="0">N/A</option>
+                    @foreach (var location in ViewBag.PnwLocations)
+                    {
+                        <option value="@location.Value" data-latlong="@location.Value">@location.Text</option>
+                    }
+                </select>
+                <span id="locationError" class="text-danger"></span> 
+                <!-- Error message will be inserted here by JavaScript -->
+            </div>
+
+            <!-- Hidden inputs for Latitude and Longitude -->
+            <input type="hidden" asp-for="Latitude" id="LatitudeInput" />
+            <input type="hidden" asp-for="Longitude" id="LongitudeInput" />
+
+            <!-- Date Input -->
+            <div class="form-group">
+                <label asp-for="Date" class="control-label">Date</label>
+                <input asp-for="Date" class="form-control" type="date" />
+                <span asp-validation-for="Date" class="text-danger"></span>
+            </div>
+
+            <!-- Notes Input -->
+            <div class="form-group">
+                <label asp-for="Notes" class="control-label">Additional Notes</label>
+                <textarea asp-for="Notes" class="form-control"placeholder="Example: Saw a strange looking bird. Weather was sunny and calm.">< id="NotesInput"></textarea>
+                <span asp-validation-for="Notes" class="text-danger"></span>
+            </div>
+
+
+            <div class="form-group">
+                <label class="control-label">Weather Conditions (Suggestions)</label>
+                <div class="border p-3 rounded bg-light">
+                    <!-- Sky Conditions -->
+                    <strong>🌤️ Sky Conditions:</strong>
+                    <ul class="list-unstyled">
+                        <li>• Sunny</li>
+                        <li>• Partly Cloudy</li>
+                        <li>• Overcast</li>
+                    </ul>
+
+                    <!-- Precipitation -->
+                    <strong>🌧️ Precipitation:</strong>
+                    <ul class="list-unstyled">
+                        <li>• Drizzle</li>
+                        <li>• Rain</li>
+                        <li>• Thunderstorm</li>
+                        <li>• Snow</li>
+                    </ul>
+
+                    <!-- Wind Conditions -->
+                    <strong>💨 Wind Conditions:</strong>
+                    <ul class="list-unstyled">
+                        <li>• Calm</li>
+                        <li>• Windy</li>
+                    </ul>
+                </div>
+                <small class="text-muted">These are suggestions for your notes. Feel free to include them!</small>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+
+
+
+@section Scripts {
+    <script>
+        document.getElementById('sightingForm').addEventListener('submit', function (event) {
+            var birdId = document.getElementById('BirdId').value;
+            var location = document.getElementById('PnwLocation').value;
+            var locationError = document.getElementById('locationError'); // Error span for location
+            var isValid = true;
+
+            locationError.textContent = ""; // Reset error message
+
+            // Ensure at least one selection is made (Bird or Location)
+            if ((birdId === '0' && location === '0')) {
+                // ✅ If both are N/A, allow submission
+            }
+            else if ((birdId === '' || birdId === '0') && (location === '' || location === '0')) {
+                event.preventDefault(); 
+                alert('Both Bird and Location cannot be null. Please select at least one.');
+                isValid = false;
+            }
+
+            if (location === '') {
+                event.preventDefault();
+                locationError.textContent = "Please select a location.";
+                isValid = false;
+            }
+
+            return isValid;
+        });
+
+        // Ensure location selection updates hidden fields correctly
+        document.getElementById('PnwLocation').addEventListener('change', function () {
+            var selectedOption = this.options[this.selectedIndex];
+            var latLong = selectedOption.getAttribute('data-latlong');
+
+            if (latLong) {
+                var [latitude, longitude] = latLong.split(',');
+                document.getElementById('LatitudeInput').value = latitude;
+                document.getElementById('LongitudeInput').value = longitude;
+            } else {
+                document.getElementById('LatitudeInput').value = '';
+                document.getElementById('LongitudeInput').value = '';
+            }
+        });
+    </script>
+}
+

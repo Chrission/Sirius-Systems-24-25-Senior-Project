@@ -22,4 +22,5 @@ public partial class Sighting
     public virtual Bird? Bird { get; set; }
 
     public virtual Sduser? Sduser { get; set; }
+
 }
