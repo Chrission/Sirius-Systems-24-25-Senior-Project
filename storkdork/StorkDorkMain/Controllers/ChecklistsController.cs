@@ -24,7 +24,6 @@ namespace StorkDorkMain.Controllers
         {
             _context = context;
             _sdUserRepository = sdUserRepository;
-
         }
 
         public async Task<IActionResult> SearchBirds(string query)
