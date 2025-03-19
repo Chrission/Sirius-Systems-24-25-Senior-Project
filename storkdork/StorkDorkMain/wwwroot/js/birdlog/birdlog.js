@@ -1,5 +1,5 @@
 
-
+//
 // wwwroot/js/birdlog/birdlog.js
 
 //CREATE.CSHTML JAVASCRIPT

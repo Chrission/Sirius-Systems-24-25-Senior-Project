@@ -2,7 +2,16 @@
 @{
     ViewData["Title"] = "Details";
 }
+<!-- Notes -->
+<div class="card mx-auto shadow-lg p-4" style="max-width: 900px; border-radius: 20px;">
+    <div class="row g-0">
+        <!-- Bird Image -->
+        <div class="col-md-5 d-flex align-items-center justify-content-center">
+            <img src="/images/placeholder-bird.svg" class="img-fluid rounded" 
+                 alt="Bird Image" style="width: 100%; height: auto; object-fit: cover; border-radius: 15px;">
+        </div>
 
+<<<<<<< HEAD
 <div class="card mx-auto shadow-lg p-4" style="max-width: 900px; border-radius: 20px;">
     <div class="row g-0">
         <!-- Bird Image -->
@@ -55,6 +64,51 @@
         </div>
     </div>
 
+=======
+        <!-- Card Details -->
+        <div class="col-md-7">
+            <div class="card-body">
+                <!-- Bird Name -->
+                <h3 class="card-title text-primary fw-bold text-center">
+                    @(Model.Bird?.CommonName ?? "Unknown Bird")
+                </h3>
+
+                <!-- Observer -->
+                <p class="card-text fs-5">
+                    <strong>Observer:</strong>
+                    @(Model.SdUser?.FirstName ?? "Unknown Observer")
+                </p>
+
+                <!-- Location -->
+                <p class="card-text fs-5">
+                    <strong>Location:</strong>
+                    @{
+                        var locationKey = Model.Latitude.HasValue && Model.Longitude.HasValue 
+                            ? $"{Model.Latitude:0.0000},{Model.Longitude:0.0000}"
+                            : null;
+                        
+                        var locationName = locationKey != null && ViewBag.PnwLocations.ContainsKey(locationKey)
+                            ? ViewBag.PnwLocations[locationKey]
+                            : "Unknown Location";
+                    }
+                    <strong>@locationName</strong>
+                    @if (locationKey != null)
+                    {
+                        <br>
+                        <small class="text-muted">Coordinates: @locationKey</small>
+                    }
+                </p>
+
+                <!-- Date -->
+                <p class="card-text fs-5">
+                    <strong>Date:</strong> 
+                    @(Model.Date?.ToString("MMMM dd, yyyy") ?? "No Date Recorded")
+                </p>
+            </div>
+        </div>
+    </div>
+
+>>>>>>> dev
     <!-- Notes Section (Below Image) -->
     <div class="card-footer bg-white">
         <h4 class="fw-bold">Notes</h4>

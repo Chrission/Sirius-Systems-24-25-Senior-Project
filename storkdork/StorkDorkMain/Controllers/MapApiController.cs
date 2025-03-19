@@ -15,6 +15,7 @@ public class MapApiController : ControllerBase
 {
     private readonly ISightingService _sightingService;
     private readonly ISDUserRepository _sdUserRepository;
+<<<<<<< HEAD
     // private readonly UserManager<IdentityUser> _userManager;
     private readonly IEBirdService _eBirdService;
 
@@ -23,6 +24,16 @@ public class MapApiController : ControllerBase
         _sightingService = sightingService;
         _sdUserRepository = sdUserRepository;
         // _userManager = userManager;
+=======
+    private readonly UserManager<IdentityUser> _userManager;
+    private readonly IEBirdService _eBirdService;
+
+    public MapApiController(ISightingService sightingService, ISDUserRepository sdUserRepository, UserManager<IdentityUser> userManager, IEBirdService eBirdService)
+    {
+        _sightingService = sightingService;
+        _sdUserRepository = sdUserRepository;
+        _userManager = userManager;
+>>>>>>> dev
         _eBirdService = eBirdService;
     }
 
@@ -43,6 +54,31 @@ public class MapApiController : ControllerBase
         }
     }
 
+<<<<<<< HEAD
+=======
+    // Grabs all sightings belonging to a userId
+    // Expectations: returns sightings for specified user
+    // [HttpGet]
+    // [Route("GetSightings/{userId}/1")]
+    // public async Task<IActionResult> GetSightingsByUserId(int userId)
+    // {
+    //     if (userId <= 0)
+    //     {
+    //         return BadRequest("Invalid user ID.");
+    //     }
+        
+    //     try
+    //     {
+    //         var sightings = await _sightingService.GetSightingsByUserIdAsync(userId);
+    //         return Ok(sightings);
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         return StatusCode(500, $"Internal Server Error: {ex.Message}");
+    //     }
+    // }
+
+>>>>>>> dev
     // Grabs all sightings belonging to the currently logged in user
     [HttpGet]
     [Route("GetSightings/{userId}")]

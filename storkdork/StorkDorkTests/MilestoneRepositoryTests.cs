@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using StorkDorkMain.Data;
 using StorkDorkMain.Models;
 using StorkDorkMain.DAL.Concrete;
+<<<<<<< HEAD
 using StorkDorkMain.DAL.Abstract;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,6 +12,14 @@ using Microsoft.AspNetCore.Mvc;
 using StorkDork.Controllers;
 using System.Security.Claims;
 using StorkDorkMain.Models.DTO;
+=======
+using System.Linq;
+using System.Threading.Tasks;
+using StorkDorkMain.DAL.Abstract;
+using Microsoft.AspNetCore.Mvc;
+using StorkDork.Controllers;
+using System.Security.Claims;
+>>>>>>> dev
 
 namespace StorkDorkMain.Tests.DAL
 {

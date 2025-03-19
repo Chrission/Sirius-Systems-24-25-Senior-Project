@@ -6,7 +6,11 @@
 <div style="display:none">
     @Html.AntiForgeryToken()
 </div>
+<<<<<<< HEAD
   
+=======
+
+>>>>>>> dev
 <h1>My Bird Watching Checklists</h1>
 
 @if (ViewBag.NoChecklistsMessage != null)
@@ -21,7 +25,10 @@
 </p>
 
 <div class="row">
+<<<<<<< HEAD
 
+=======
+>>>>>>> dev
     @foreach (var checklist in Model)
     {
         var spotted = checklist.ChecklistItems?.Count(ci => ci.Sighted ?? false) ?? 0;
@@ -147,4 +154,10 @@
             });
         });
     </script>
+<<<<<<< HEAD
 }
+=======
+}
+
+<!-- Notes -->
+>>>>>>> dev

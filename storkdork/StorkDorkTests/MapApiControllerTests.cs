@@ -39,6 +39,7 @@ public class MapApiControllerTests
         {
             new SightMarker
             {
+<<<<<<< HEAD
                 CommonName = "American Herring Gull",
                 SciName = "Larus smithsonianus",
                 Longitude = -123.24m,
@@ -56,6 +57,77 @@ public class MapApiControllerTests
                 Date = DateTime.UtcNow
             }
         };
+=======
+                new SightMarker
+                {
+                    CommonName = "American Herring Gull",
+                    SciName = "Larus smithsonianus",
+                    Longitude = -123.24m,
+                    Latitude = 44.85m,
+                    Description = "Seen near the park",
+                    Date = DateTime.UtcNow
+                },
+                new SightMarker
+                {
+                    CommonName = "Northern Flicker",
+                    SciName = "Colaptes auratus",
+                    Longitude = -123.25m,
+                    Latitude = 44.86m,
+                    Description = "Perched on a fence",
+                    Date = DateTime.UtcNow
+                }
+            };
+
+            _mockSightingService
+                .Setup(s => s.GetSightingsAsync())
+                .ReturnsAsync(mockSightings);
+
+            // Act
+            var result = await _controller.GetSightings();
+
+            // Assert
+            Assert.That(result, Is.InstanceOf<OkObjectResult>());
+            var okResult = result as OkObjectResult;
+            Assert.That(okResult.Value, Is.EqualTo(mockSightings));
+        }
+
+        [Test]
+        public async Task GetSightings_ReturnsOk_WithEmptyList()
+        {
+            // Arrange
+            _mockSightingService
+                .Setup(s => s.GetSightingsAsync())
+                .ReturnsAsync(new List<SightMarker>());
+
+            // Act
+            var result = await _controller.GetSightings();
+
+            // Assert
+            Assert.That(result, Is.InstanceOf<OkObjectResult>());
+            var okResult = result as OkObjectResult;
+            Assert.That(okResult.Value, Is.Not.Null);
+            Assert.That(okResult.Value, Is.InstanceOf<List<SightMarker>>());
+            Assert.That(((List<SightMarker>)okResult.Value).Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public async Task GetSightingsByUserId_ReturnsOk_WithUserSightings()
+        {
+            // Arrange
+            int userId = 1;
+            var mockSightings = new List<SightMarker>
+            {
+                new SightMarker
+                {
+                    CommonName = "Common Raven",
+                    SciName = "Corvus corax",
+                    Longitude = -123.2378m,
+                    Latitude = 44.8490m,
+                    Description = "Hopping near the library",
+                    Date = DateTime.UtcNow
+                }
+            };
+>>>>>>> dev
 
         _mockSightingService
             .Setup(s => s.GetSightingsAsync())

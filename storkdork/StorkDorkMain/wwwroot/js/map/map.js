@@ -10,8 +10,11 @@ const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
 
+<<<<<<< HEAD
 let markers = {};
 
+=======
+>>>>>>> dev
 async function fetchSightingsByUser() {
     let user = await fetchUser();
 
@@ -57,6 +60,7 @@ async function fetchUser() {
     }
 }
 
+<<<<<<< HEAD
 async function reverseGeocode(lat, lng) {
     const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`;
 
@@ -143,6 +147,22 @@ async function updateSightingLocation(sightingId, country, subdivision) {
     } catch (error) {
         console.error("Error updating sighting location:", error);
     }
+=======
+function makeSightingMarkers(data)
+{
+    data.forEach(sighting => {
+                console.log("Sighting Data:", sighting); // Debugging
+
+                if (sighting.latitude && sighting.longitude) { // Ensure coordinates exist
+                    L.marker([sighting.latitude, sighting.longitude])
+                        .addTo(map)
+                        .bindPopup(`<b>${sighting.commonName || 'Unknown Bird'}</b><br>
+                                    <em>${sighting.sciName || 'Unknown'}</em><br>
+                                    ${sighting.date ? new Date(sighting.date).toLocaleDateString() : "Unknown Date"}<br>
+                                    ${sighting.description || 'No notes available'}`);
+                }
+            });
+>>>>>>> dev
 }
 
 window.onload = function() {

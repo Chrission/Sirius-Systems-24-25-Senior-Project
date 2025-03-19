@@ -12,6 +12,7 @@
                     <label for="filterBird">Filter by Bird Species:</label>
                     <input type="text" id="filterBird" name="filterBird" class="form-control" value="@ViewBag.FilterBird" />
                 </div>
+<<<<<<< HEAD
                 <!-- Location Dropdown -->
                 <div class="form-group mb-3">
                     <label for="locationId">Filter by Location:</label>
@@ -29,6 +30,26 @@
                     </select>
                 </div>
 
+=======
+
+                <!-- Location Dropdown -->
+                <div class="form-group mb-3">
+                    <label for="locationId">Filter by Location:</label>
+                    <select id="locationId" name="locationId" class="form-control">
+                        <option value="">-- Select Location --</option>
+                        @if (ViewBag.PnwLocations != null)
+                        {
+                            foreach (var kvp in (Dictionary<string, string>)ViewBag.PnwLocations)
+                            {
+                                <option value="@kvp.Key" selected="@(ViewBag.LocationId == kvp.Key ? "selected" : null)">
+                                    @kvp.Value
+                                </option>
+                            }
+                        }
+                    </select>
+                </div>
+
+>>>>>>> dev
                 <!-- Apply and Reset Filter Buttons -->
                 <div class="form-group">
                     <button type="submit" class="btn btn-primary">Apply Filters</button>
@@ -132,7 +153,10 @@
             </table>
         </div>
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> dev
     else
     {
         <p class="text-muted mt-4">No sightings found for your account.</p>
@@ -153,4 +177,8 @@
         });
     </script>
 }
+<<<<<<< HEAD
 
+=======
+<!-- Notes -->
+>>>>>>> dev

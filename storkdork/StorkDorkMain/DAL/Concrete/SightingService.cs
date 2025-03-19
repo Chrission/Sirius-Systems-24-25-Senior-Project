@@ -30,8 +30,12 @@ public class SightingService : ISightingService
             .Include(s => s.Bird)
             .Select(s => new SightMarker
             {
+<<<<<<< HEAD
                 SightingId = s.Id,
                 CommonName = s.Bird.CommonName ?? "Unkown Name",
+=======
+                CommonName = s.Bird.CommonName ?? "Unknown Name",
+>>>>>>> dev
                 SciName = s.Bird.ScientificName,
                 Longitude = s.Longitude,
                 Latitude = s.Latitude,
@@ -51,8 +55,12 @@ public class SightingService : ISightingService
             .Include(s => s.Bird)
             .Select(s => new SightMarker
             {
+<<<<<<< HEAD
                 SightingId = s.Id,
                 CommonName = s.Bird.CommonName ?? "Unkown Name",
+=======
+                CommonName = s.Bird.CommonName ?? "Unknown Name",
+>>>>>>> dev
                 SciName = s.Bird.ScientificName,
                 Longitude = s.Longitude,
                 Latitude = s.Latitude,
@@ -74,6 +82,7 @@ public class SightingService : ISightingService
 
         return eBirdSightings;
     }
+<<<<<<< HEAD
     
     public async Task UpdateSightingLocationAsync(int sightingId, string country, string subdivision)
     {
@@ -87,6 +96,8 @@ public class SightingService : ISightingService
         sighting.Subdivision = subdivision;
         await _storkDorkContext.SaveChangesAsync();
     }
+=======
+>>>>>>> dev
 
     // public async Task<List<SightMarker>> GetSightingsByCurrentUserAsync(int userId)
     // {
