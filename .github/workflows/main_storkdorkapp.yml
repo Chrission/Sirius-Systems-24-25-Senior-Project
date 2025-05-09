@@ -1,11 +1,8 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
 name: Build and deploy ASP.Net Core app to Azure Web App - storkdorkapp
 
 env:
-  AZURE_WEBAPP_PACKAGE_PATH: 'storkdork/StorkDorkMain'
-  DOTNET_VERSION: '8.0' # Version of .NET Core to use
+  AZURE_WEBAPP_PACKAGE_PATH: '${{ github.workspace }}/publish'  # New publish path
+  DOTNET_VERSION: '8.0'
   
 on:
   push:
@@ -17,7 +14,7 @@ jobs:
   build:
     runs-on: windows-latest
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -27,18 +24,14 @@ jobs:
         with:
           dotnet-version: '8.x'
 
-      - name: Build with dotnet
-        run: dotnet build
-          ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/StorkDork.csproj --configuration Release
+      - name: Publish .NET Core app
+        run: dotnet publish storkdork/StorkDorkMain/StorkDork.csproj -c Release -o ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
 
-      - name: dotnet publish
-        run: dotnet publish ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/StorkDork.csproj -c Release -o "${{env.DOTNET_ROOT}}/myapp"
-
-      - name: Upload artifact for deployment job
+      - name: Upload published artifact
         uses: actions/upload-artifact@v4
         with:
-          name: .net-app
-          path: ${{env.AZURE_WEBAPP_PACKAGE_PATH}}
+          name: published-app
+          path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
 
   deploy:
     runs-on: windows-latest
@@ -46,18 +39,19 @@ jobs:
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    
+
     steps:
-      - name: Download artifact from build job
+      - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: .net-app
-      
+          name: published-app
+          path: ./published
+
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'storkdorkapp'
           slot-name: 'Production'
-          package: .
+          package: ./published 
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_681CB4666C77411A948188E1E890D326 }}
