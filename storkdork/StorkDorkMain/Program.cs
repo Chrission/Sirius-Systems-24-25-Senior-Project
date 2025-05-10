@@ -73,17 +73,6 @@ builder.Services.AddDbContext<StorkDorkDbContext>(options => options
     .UseSqlServer(connectionString)
 );
 
-var identityRaw = builder.Configuration.GetConnectionString("IdentityDB");
-var appRaw = builder.Configuration.GetConnectionString("StorkDorkDB");
-
-Console.WriteLine("Raw IdentityDB connection: " + identityRaw);
-Console.WriteLine("Raw StorkDorkDB connection: " + appRaw);
-
-var conStrBuilder = new SqlConnectionStringBuilder(appRaw ?? throw new Exception("Missing StorkDorkDB connection string"));
-var connectionString = conStrBuilder.ConnectionString;
-
-var conStrBuilderTwo = new SqlConnectionStringBuilder(identityRaw ?? throw new Exception("Missing IdentityDB connection string"));
-var connectionStringIdentity = conStrBuilderTwo.ConnectionString;
 
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
