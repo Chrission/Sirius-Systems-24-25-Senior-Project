@@ -14,11 +14,12 @@ using Microsoft.AspNetCore.Authorization;
 using StorkDorkMain.DAL.Abstract;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using StorkDorkMain.DAL.Concrete;
+using StorkDorkMain.Services;
 
 
 namespace StorkDorkMain.Controllers
 {
-    
+
 
     public class BirdLogController : Controller
     {
@@ -26,16 +27,15 @@ namespace StorkDorkMain.Controllers
         private readonly StorkDorkDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ISDUserRepository _sdUserRepository;
-        
+        private readonly INotificationService _notificationService;
 
-        public BirdLogController(StorkDorkDbContext context, UserManager<IdentityUser> userManager, ISDUserRepository sdUserRepository, IMilestoneRepository milestoneRepo)
+        public BirdLogController(StorkDorkDbContext context, UserManager<IdentityUser> userManager, ISDUserRepository sdUserRepository, IMilestoneRepository milestoneRepo, INotificationService notificationService)
         {
             _context = context;
             _userManager = userManager;
             _sdUserRepository = sdUserRepository;
             _milestoneRepo = milestoneRepo;
-
-            
+            _notificationService = notificationService;
         }
 
         //a method to search for birds in the bird log.
@@ -51,11 +51,11 @@ namespace StorkDorkMain.Controllers
             var birds = await _context.Birds
                 .Where(b => b.CommonName.Contains(term) || b.ScientificName.Contains(term))
                 .Select(b => new
-                    {
-                        id = b.Id,
-                        commonName = b.CommonName,
-                        scientificName = b.ScientificName
-                    })
+                {
+                    id = b.Id,
+                    commonName = b.CommonName,
+                    scientificName = b.ScientificName
+                })
                     .Take(10)
                     .ToListAsync();
             return Json(birds);
@@ -69,7 +69,7 @@ namespace StorkDorkMain.Controllers
             //This is to check if the user is authenticated
             if (!User.Identity.IsAuthenticated)
             {
-                return Unauthorized("User is not authenticated"); 
+                return Unauthorized("User is not authenticated");
             }
 
             //To get the current user's SdUser
@@ -85,8 +85,8 @@ namespace StorkDorkMain.Controllers
                 .Include(s => s.SdUser)
                 .Where(s => s.SdUserId == sdUser.Id)
                 .AsQueryable();
-            
-          
+
+
 
             // Apply bird filter if a birdId is provided
             if (birdId.HasValue)
@@ -108,7 +108,7 @@ namespace StorkDorkMain.Controllers
                 .Select(b => b.FamilyCommonName)
                 .Distinct()
                 .ToListAsync();
-       
+
 
             ViewBag.FamilyCommonNames = await _context.Birds
                 .Where(b => b.FamilyCommonName != null) // Ensure no null values
@@ -122,22 +122,22 @@ namespace StorkDorkMain.Controllers
                 .Distinct()
                 .ToListAsync();
 
-            
+
             // Apply bird name filter if filterBird is provided
             if (!string.IsNullOrEmpty(filterBird))
             {
-                sightingsQuery =  sightingsQuery
+                sightingsQuery = sightingsQuery
                     .Where(s => s.Bird != null && s.Bird.CommonName != null && s.Bird.CommonName
                     .Contains(filterBird)); // Filter sightings by bird name
             }
-            
+
             sightingsQuery = ApplySorting(sortOrder, sightingsQuery);
 
 
-            
+
 
             // Sorting options for the sightings
-            var sortOptions = new Dictionary<string, Func<IQueryable<Sighting>,IQueryable<Sighting>>>
+            var sortOptions = new Dictionary<string, Func<IQueryable<Sighting>, IQueryable<Sighting>>>
             {
                 
                 // Sort by date (newest to oldest), nulls at the bottom
@@ -171,14 +171,14 @@ namespace StorkDorkMain.Controllers
                 { "location-null", q => q.OrderBy(s => s.Latitude == null ? 0 : 1).ThenBy(s => s.Longitude == null ? 0 : 1) }
 
             };
-                     
+
             var sightings = await sightingsQuery.ToListAsync();
             return View(await sightingsQuery.ToListAsync());
 
-           
+
         }
 
-        
+
 
         // GET: BirdLog/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -215,7 +215,7 @@ namespace StorkDorkMain.Controllers
                 // Pass the common name to the view to prefill the field
                 ViewBag.PrefilledBirdName = commonName;
             }
-                // Fetch birds if a search term is provided
+            // Fetch birds if a search term is provided
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
                 var birds = _context.Birds
@@ -241,7 +241,7 @@ namespace StorkDorkMain.Controllers
 
             }
 
-           //get the current user id
+            //get the current user id
             ViewBag.SdUserId = currentSdUser.Id;
 
             // Populate ViewBag with birds
@@ -250,7 +250,7 @@ namespace StorkDorkMain.Controllers
             ViewBag.DefaultLat = 45.5231; // Example default coordinates
             ViewBag.DefaultLng = -122.6765;
             ViewBag.DefaultZoom = 7;
-   
+
             return View();
         }
 
@@ -297,54 +297,52 @@ namespace StorkDorkMain.Controllers
                 ViewBag.DefaultLat = sightings.Latitude ?? 45.5231m;
                 ViewBag.DefaultLng = sightings.Longitude ?? -122.6765m;
                 ViewBag.DefaultZoom = sightings.Latitude != null ? 12 : 7;
-                
+
                 // Preserve search term if needed
                 ViewBag.PrefilledBirdName = Request.Form["birdSearch"];
-                
+
                 return View(sightings);
             }
 
-           //if (photoFile != null && photoFile.Length > 0)
-           //{
-                // Validate file
+            //if (photoFile != null && photoFile.Length > 0)
+            //{
+            // Validate file
             //   if (photoFile.Length > 5 * 1024 * 1024) // 5MB
-           //     {
-              //     ModelState.AddModelError("", "File size exceeds 5MB limit");
+            //     {
+            //     ModelState.AddModelError("", "File size exceeds 5MB limit");
             //    }
             //    else if (!photoFile.ContentType.StartsWith("image/")) 
             //    {
             //        ModelState.AddModelError("", "Only image files are allowed");
-             //   }
+            //   }
 
-           // }
+            // }
 
 
             if (ModelState.IsValid)
             {
                 bool hasPhoto = false;
-             
+                List<ChecklistItem> checklistItems = new List<ChecklistItem>();
+                List<Checklist> completedChecklists = new List<Checklist>();
+
                 try
                 {
 
                     //if (photoFile != null && photoFile.Length > 0)
-                  //  {
-                 //       using var memoryStream = new MemoryStream();
-                //        await photoFile.CopyToAsync(memoryStream);
-                 //       sightings.PhotoData = memoryStream.ToArray();
-                 //       sightings.PhotoContentType = photoFile.ContentType;
-                 //       hasPhoto = true;
-                 //   }   
-                   // else
-                  //  {
-                 ////       sightings.PhotoData = Array.Empty<byte>();
-                   //     sightings.PhotoContentType = string.Empty;
-                  //      Console.WriteLine("No photo file uploaded.");
+                    //  {
+                    //       using var memoryStream = new MemoryStream();
+                    //        await photoFile.CopyToAsync(memoryStream);
+                    //       sightings.PhotoData = memoryStream.ToArray();
+                    //       sightings.PhotoContentType = photoFile.ContentType;
+                    //       hasPhoto = true;
+                    //   }   
+                    // else
+                    //  {
+                    ////       sightings.PhotoData = Array.Empty<byte>();
+                    //     sightings.PhotoContentType = string.Empty;
+                    //      Console.WriteLine("No photo file uploaded.");
 
-                   // }
-                   
-                   
-
-
+                    // }
 
 
                     _context.Add(sightings);
@@ -356,11 +354,10 @@ namespace StorkDorkMain.Controllers
                     if (milestone == null)
                     {
                         // Create new milestone if none exists
-                        milestone = new Milestone 
-                        { 
+                        milestone = new Milestone
+                        {
                             SDUserId = currentSdUser.Id,
                             SightingsMade = 1,
-                            //PhotosContributed = hasPhoto ? 1 : 0
                         };
                         _context.Add(milestone);
                     }
@@ -370,18 +367,78 @@ namespace StorkDorkMain.Controllers
                         milestone.SightingsMade++;
                     }
 
-                    // Save the milestone changes
-                    await _context.SaveChangesAsync();
+                    // SD-111: auto-update checklist items
+                    if (sightings.BirdId.HasValue)
+                    {
+                        // find all checklist items for this user and bird that aren't already marked as sighted
+                        checklistItems = await _context.ChecklistItems
+                            .Include(ci => ci.Checklist)
+                            .Where(ci =>
+                                ci.BirdId == sightings.BirdId &&
+                                ci.Checklist != null && ci.Checklist.SdUserId == currentSdUser.Id &&
+                                (ci.Sighted == false || ci.Sighted == null))
+                            .ToListAsync();
 
-                    return RedirectToAction(nameof(Confirmation), new { 
-                    userId = sightings.SdUserId,
-                    //hasPhoto = hasPhoto
+                        foreach (var item in checklistItems)
+                        {
+                            item.Sighted = true;
+                        }
 
-                });
-            
+                        if (checklistItems.Any())
+                        {
+                            // Get the unique checklist IDs that were affected
+                            var updatedChecklistIds = checklistItems.Select(ci => ci.ChecklistId).Distinct().ToList();
 
+                            // For each affected checklist, check if ALL items are now sighted
+                            foreach (var checklistId in updatedChecklistIds)
+                            {
+                                // Check if this checklist is now complete
+                                var allSighted = await _context.ChecklistItems
+                                    .Where(ci => ci.ChecklistId == checklistId)
+                                    .AllAsync(ci => ci.Sighted.HasValue && ci.Sighted.Value);
 
+                                if (allSighted)
+                                {
+                                    // Get checklist details without loading navigation properties
+                                    var completeChecklist = await _context.Checklists
+                                        .AsNoTracking() // Optional, for better performance
+                                        .Select(c => new { c.Id, c.ChecklistName })
+                                        .FirstOrDefaultAsync(c => c.Id == checklistId);
+
+                                    if (completeChecklist != null)
+                                    {
+                                        // Add to tracking list using the Checklist model
+                                        completedChecklists.Add(new Checklist
+                                        {
+                                            Id = completeChecklist.Id,
+                                            ChecklistName = completeChecklist.ChecklistName
+                                        });
+
+                                        // Create notification
+                                        await _notificationService.CreateNotificationAsync(
+                                            currentSdUser.Id,
+                                            $"Congratulations! Your checklist '{completeChecklist.ChecklistName}' is now complete!",
+                                            "ChecklistComplete",
+                                            $"/Checklist/Details/{checklistId}"
+                                        );
+                                    }
+                                }
+                            }
+                        }
+
+                        // Save all changes
+                        await _context.SaveChangesAsync();
+
+                        // Pass information to the confirmation page
+                        return RedirectToAction(nameof(Confirmation), new
+                        {
+                            sightingId = sightings.Id,
+                            updatedChecklistCount = checklistItems.Count,
+                            completedChecklistCount = completedChecklists.Count
+                        });
+                    }
                 }
+
                 catch (Exception ex)
                 {
                     ModelState.AddModelError("", "An error occurred while saving.");
@@ -389,9 +446,9 @@ namespace StorkDorkMain.Controllers
                 }
 
             }
-            
-            
-                
+
+
+
             // Debugging: Log success
             Console.WriteLine("Sighting saved successfully.");
 
@@ -399,134 +456,134 @@ namespace StorkDorkMain.Controllers
 
             // If the model state is invalid, repopulate the ViewBag and return the view
             ViewBag.Birds = new SelectList(_context.Birds, "Id", "CommonName", sightings.BirdId);
-            ViewBag.DefaultLat  = sightings.Latitude  ?? 45.5231m;
+            ViewBag.DefaultLat = sightings.Latitude ?? 45.5231m;
             ViewBag.DefaultLng = sightings.Longitude ?? -122.6765m;
             ViewBag.DefaultZoom = sightings.Latitude != null ? 12 : 7;
-                          
+
             return View(sightings);
         }
 
 
 
-// GET: BirdLog/Edit/5
-[HttpGet]
-[Authorize]
-public async Task<IActionResult> Edit(int? id, string? searchTerm = null, string? commonName = null)
-{
-    if (id == null) return NotFound();
-
-    var sighting = await _context.Sightings
-        .Include(s => s.Bird)
-        .Include(s => s.SdUser)
-        .FirstOrDefaultAsync(s => s.Id == id);
-
-    if (sighting == null) return NotFound();
-
-    // Authorization check
-    var currentUser = await _sdUserRepository.GetSDUserByIdentity(User);
-    if (currentUser == null || sighting.SdUserId != currentUser.Id)
-        return Forbid();
-
-    // Search functionality
-    if (!string.IsNullOrWhiteSpace(commonName))
-    {
-        ViewBag.PrefilledBirdName = commonName;
-    }
-    else if (sighting.Bird != null)
-    {
-        ViewBag.PrefilledBirdName = sighting.Bird.CommonName;
-    }
-
-    if (!string.IsNullOrWhiteSpace(searchTerm))
-    {
-        var birds = _context.Birds
-            .Where(b => b.CommonName.ToLower().Contains(searchTerm.ToLower()))
-            .Select(b => new Bird
-            {
-                Id = b.Id,
-                CommonName = b.CommonName,
-                ScientificName = b.ScientificName
-            })
-            .Take(10)
-            .ToList();
-
-        ViewBag.SearchResults = birds;
-        ViewBag.SearchTerm = searchTerm;
-    }
-
-    // Prefill data
-    ViewBag.Birds = new SelectList(_context.Birds, "Id", "CommonName", sighting.BirdId);
-    ViewBag.DefaultLat = sighting.Latitude ?? 45.5231m;
-    ViewBag.DefaultLng = sighting.Longitude ?? -122.6765m;
-    ViewBag.DefaultZoom = sighting.Latitude.HasValue ? 12 : 7;
-    ViewBag.HasPhoto = sighting.PhotoData != null;
-
-    return View(sighting);
-}
-
-    // POST: BirdLog/Edit/5
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    [Authorize]
-    public async Task<IActionResult> Edit(int id, [Bind("Id,SdUserId,BirdId,Date,Latitude,Longitude,Notes")] Sighting updatedSighting)
-    {
-        if (id != updatedSighting.Id) return NotFound();
-
-        var existingSighting = await _context.Sightings.FindAsync(id);
-        if (existingSighting == null) return NotFound();
-
-        // Authorization check
-        var currentUser = await _sdUserRepository.GetSDUserByIdentity(User);
-        if (currentUser == null || existingSighting.SdUserId != currentUser.Id)
-            return Forbid();
-
-        // Validation
-        if ((updatedSighting.Latitude.HasValue || updatedSighting.Longitude.HasValue) &&
-            (!updatedSighting.Latitude.HasValue || !updatedSighting.Longitude.HasValue))
+        // GET: BirdLog/Edit/5
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> Edit(int? id, string? searchTerm = null, string? commonName = null)
         {
-            ModelState.AddModelError("", "Both coordinates must be provided");
+            if (id == null) return NotFound();
+
+            var sighting = await _context.Sightings
+                .Include(s => s.Bird)
+                .Include(s => s.SdUser)
+                .FirstOrDefaultAsync(s => s.Id == id);
+
+            if (sighting == null) return NotFound();
+
+            // Authorization check
+            var currentUser = await _sdUserRepository.GetSDUserByIdentity(User);
+            if (currentUser == null || sighting.SdUserId != currentUser.Id)
+                return Forbid();
+
+            // Search functionality
+            if (!string.IsNullOrWhiteSpace(commonName))
+            {
+                ViewBag.PrefilledBirdName = commonName;
+            }
+            else if (sighting.Bird != null)
+            {
+                ViewBag.PrefilledBirdName = sighting.Bird.CommonName;
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                var birds = _context.Birds
+                    .Where(b => b.CommonName.ToLower().Contains(searchTerm.ToLower()))
+                    .Select(b => new Bird
+                    {
+                        Id = b.Id,
+                        CommonName = b.CommonName,
+                        ScientificName = b.ScientificName
+                    })
+                    .Take(10)
+                    .ToList();
+
+                ViewBag.SearchResults = birds;
+                ViewBag.SearchTerm = searchTerm;
+            }
+
+            // Prefill data
+            ViewBag.Birds = new SelectList(_context.Birds, "Id", "CommonName", sighting.BirdId);
+            ViewBag.DefaultLat = sighting.Latitude ?? 45.5231m;
+            ViewBag.DefaultLng = sighting.Longitude ?? -122.6765m;
+            ViewBag.DefaultZoom = sighting.Latitude.HasValue ? 12 : 7;
+            ViewBag.HasPhoto = sighting.PhotoData != null;
+
+            return View(sighting);
         }
 
-        if (updatedSighting.BirdId == null)
+        // POST: BirdLog/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,SdUserId,BirdId,Date,Latitude,Longitude,Notes")] Sighting updatedSighting)
         {
-            ModelState.AddModelError("BirdId", "Please select a bird.");
+            if (id != updatedSighting.Id) return NotFound();
+
+            var existingSighting = await _context.Sightings.FindAsync(id);
+            if (existingSighting == null) return NotFound();
+
+            // Authorization check
+            var currentUser = await _sdUserRepository.GetSDUserByIdentity(User);
+            if (currentUser == null || existingSighting.SdUserId != currentUser.Id)
+                return Forbid();
+
+            // Validation
+            if ((updatedSighting.Latitude.HasValue || updatedSighting.Longitude.HasValue) &&
+                (!updatedSighting.Latitude.HasValue || !updatedSighting.Longitude.HasValue))
+            {
+                ModelState.AddModelError("", "Both coordinates must be provided");
+            }
+
+            if (updatedSighting.BirdId == null)
+            {
+                ModelState.AddModelError("BirdId", "Please select a bird.");
+            }
+
+            // Update fields
+            existingSighting.BirdId = updatedSighting.BirdId;
+            existingSighting.Date = updatedSighting.Date ?? DateTime.UtcNow;
+            existingSighting.Latitude = updatedSighting.Latitude;
+            existingSighting.Longitude = updatedSighting.Longitude;
+            existingSighting.Notes = updatedSighting.Notes;
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(existingSighting);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Confirmation), new { userId = existingSighting.SdUserId });
+                }
+                catch (DbUpdateConcurrencyException ex)
+                {
+                    if (!SightingExists(id)) return NotFound();
+                    ModelState.AddModelError("", "Concurrency error: " + ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Error saving: " + ex.Message);
+                }
+            }
+
+            // Repopulate view data if invalid
+            ViewBag.Birds = new SelectList(_context.Birds, "Id", "CommonName", existingSighting.BirdId);
+            ViewBag.DefaultLat = existingSighting.Latitude ?? 45.5231m;
+            ViewBag.DefaultLng = existingSighting.Longitude ?? -122.6765m;
+            ViewBag.DefaultZoom = existingSighting.Latitude.HasValue ? 12 : 7;
+            ViewBag.PrefilledBirdName = Request.Form["birdSearch"];
+
+            return View(existingSighting);
         }
-
-        // Update fields
-        existingSighting.BirdId = updatedSighting.BirdId;
-        existingSighting.Date = updatedSighting.Date ?? DateTime.UtcNow;
-        existingSighting.Latitude = updatedSighting.Latitude;
-        existingSighting.Longitude = updatedSighting.Longitude;
-        existingSighting.Notes = updatedSighting.Notes;
-
-        if (ModelState.IsValid)
-        {
-            try
-            {
-                _context.Update(existingSighting);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Confirmation), new { userId = existingSighting.SdUserId });
-            }
-            catch (DbUpdateConcurrencyException ex)
-            {
-                if (!SightingExists(id)) return NotFound();
-                ModelState.AddModelError("", "Concurrency error: " + ex.Message);
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", "Error saving: " + ex.Message);
-            }
-        }
-
-        // Repopulate view data if invalid
-        ViewBag.Birds = new SelectList(_context.Birds, "Id", "CommonName", existingSighting.BirdId);
-        ViewBag.DefaultLat = existingSighting.Latitude ?? 45.5231m;
-        ViewBag.DefaultLng = existingSighting.Longitude ?? -122.6765m;
-        ViewBag.DefaultZoom = existingSighting.Latitude.HasValue ? 12 : 7;
-        ViewBag.PrefilledBirdName = Request.Form["birdSearch"];
-
-        return View(existingSighting);
-    }
 
 
 
@@ -548,12 +605,12 @@ public async Task<IActionResult> Edit(int? id, string? searchTerm = null, string
             }
 
 
-        
+
             return View(sighting);
         }
-            
-            
-        
+
+
+
 
         // POST: BirdLog/Delete/5
         [HttpPost, ActionName("Delete")]
@@ -574,19 +631,24 @@ public async Task<IActionResult> Edit(int? id, string? searchTerm = null, string
         {
             return _context.Sightings.Any(e => e.Id == id);
         }
-        
+
 
         // this is the confirmation page so when a user successfully creates a logged sighting, they will be taken here
-        public IActionResult Confirmation(int? userId, bool hasPhoto)
+        public IActionResult Confirmation(int? sightingId, int updatedChecklistCount = 0, int completedChecklistCount = 0)
         {
-            var sighting = _context.Sightings.Find(userId);
-            
+            var sighting = _context.Sightings.Find(sightingId);
+
             // Initialize HasPhoto as boolean
-            ViewBag.HasPhoto = sighting?.PhotoData != null; // This will be true or false, never null
-            
-            ViewBag.UserId = userId;
-            ViewBag.UserName = _context.SdUsers.Find(userId)?.FirstName;
-            
+            ViewBag.HasPhoto = sighting?.PhotoData != null;
+
+            // set both the updated & completed checklist counts for view
+            ViewBag.UpdatedChecklistCount = updatedChecklistCount;
+            ViewBag.CompletedChecklistCount = completedChecklistCount;
+
+            ViewBag.UserId = sighting?.SdUserId;
+            ViewBag.UserName = sighting?.SdUserId != null ?
+                _context.SdUsers.Find(sighting.SdUserId)?.FirstName : null;
+
             return View(sighting);
         }
 
@@ -600,8 +662,8 @@ public async Task<IActionResult> Edit(int? id, string? searchTerm = null, string
                     id = s.Id,
                     date = s.Date.HasValue ? s.Date.Value.ToShortDateString() : "No date entered",
                     birdCommonName = s.Bird != null ? s.Bird.CommonName : "Bird Species Unavailable",
-                    location = (s.Latitude.HasValue && s.Longitude.HasValue) 
-                        ? $"{s.Latitude.Value.ToString("0.0000")}, {s.Longitude.Value.ToString("0.0000")}" 
+                    location = (s.Latitude.HasValue && s.Longitude.HasValue)
+                        ? $"{s.Latitude.Value.ToString("0.0000")}, {s.Longitude.Value.ToString("0.0000")}"
                         : "Unknown Location",
                     notes = !string.IsNullOrEmpty(s.Notes) ? s.Notes : "No notes recorded"
                 })
@@ -610,7 +672,7 @@ public async Task<IActionResult> Edit(int? id, string? searchTerm = null, string
             return Json(sightings);
         }
 
-        
+
         private IQueryable<Sighting> ApplySorting(string sortOrder, IQueryable<Sighting> sightingsQuery)
         {
             // Add your sorting logic here (same as in the Index action)
@@ -637,7 +699,7 @@ public async Task<IActionResult> Edit(int? id, string? searchTerm = null, string
             }
             return sightingsQuery.OrderBy(s => s.Date);
         }
-        
+
         public IActionResult GetSightingImage(int id)
         {
             var sighting = _context.Sightings.Find(id);
@@ -647,7 +709,7 @@ public async Task<IActionResult> Edit(int? id, string? searchTerm = null, string
             }
             return NotFound();
         }
-            
+
 
 
     }
