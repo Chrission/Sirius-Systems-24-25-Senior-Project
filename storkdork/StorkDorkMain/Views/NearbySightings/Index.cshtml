@@ -1,0 +1,522 @@
+@model StorkDorkMain.Models.NearbySightingsViewModel
+
+@{
+    ViewData["Title"] = "Nearby Bird Sightings";
+}
+
+<div class="container my-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">Nearby Bird Sightings</h1>
+            <p class="lead">Explore recent bird sightings in your area or any location you choose.</p>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="storkdork-card p-0">
+                <div class="card-header" style="background-color: #aabd8c; color: #fcf2e0;">
+                    <h5 class="mb-0 descriptive-text">Location Settings</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <button id="useMyLocation" class="btn storkdork-button">
+                            <i class="bi bi-geo-alt-fill me-2"></i> Use My Location
+                        </button>
+                        <div id="locationStatus" class="mt-2"></div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="searchLocation" class="form-label">Or search for a place:</label>
+                        <div class="input-group">
+                            <input type="text" id="searchLocation" class="form-control input-style" 
+                                placeholder="Enter city, park, etc.">
+                            <button id="searchLocationBtn" class="btn storkdork-button">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="radiusSlider" class="form-label">Search radius: <span id="radiusValue">@Model.Radius</span> km</label>
+                        <input type="range" class="form-range" id="radiusSlider" 
+                               min="1" max="50" step="1" value="@Model.Radius">
+                    </div>
+                    
+                    <div class="d-flex flex-wrap gap-2 align-items-center">
+                        <button id="findSightings" class="btn storkdork-button">
+                            <i class="bi bi-binoculars-fill me-2"></i>
+                            Find Nearby Sightings
+                        </button>
+                        <a href="@Url.Action("Map", "Leaflet")" class="btn storkdork-button">
+                            <i class="bi bi-pin-map-fill me-2"></i> View Your Logged Sightings
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="storkdork-card p-0">
+                <div class="card-header" style="background-color: #aabd8c; color: #fcf2e0;">
+                    <h5 class="mb-0 descriptive-text">Current Location</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div id="map" style="height: 350px; border-radius: 0 0 15px 15px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="storkdork-card p-0">
+                <div class="card-header d-flex justify-content-between align-items-center" 
+                     style="background-color: #aabd8c; color: #fcf2e0;">
+                    <h5 class="mb-0 descriptive-text">Recent Sightings</h5>
+                    <div id="loadingIndicator" class="spinner-border spinner-border-sm text-light d-none" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <div id="sightingsResults" class="row">
+                        <!-- Results will be loaded here -->
+                        <div class="col-12 text-center">
+                            <p class="text-muted">Select a location and click "Find Nearby Sightings" to see results</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="~/css/map-page.css">
+    <link rel="stylesheet" href="~/css/nearbysightings.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize variables
+            let map;
+            let marker;
+            let currentLat = @Model.DefaultLatitude;
+            let currentLng = @Model.DefaultLongitude;
+            let currentRadius = @Model.Radius;
+            let searchDebounceTimer;
+            let sightingsLayer;
+            
+            // Custom marker icon
+            const storkDorkIcon = L.icon({
+                iconUrl: '../images/map/StorkMarkerIcon.png',
+                iconSize: [64, 64]
+            });
+            
+            // Initialize map
+            function initMap() {
+                map = L.map('map').setView([currentLat, currentLng], 8);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+                
+                // Use custom icon for the location marker
+                marker = L.marker([currentLat, currentLng], {
+                    draggable: true
+                }).addTo(map);
+                
+                // Create a layer for sightings
+                sightingsLayer = L.layerGroup().addTo(map);
+                
+                // Update coordinates when marker is dragged
+                marker.on('dragend', function(e) {
+                    const position = marker.getLatLng();
+                    currentLat = position.lat;
+                    currentLng = position.lng;
+                });
+                
+                // Update marker when clicking on map
+                map.on('click', function(e) {
+                    updateMarkerPosition(e.latlng.lat, e.latlng.lng);
+                });
+                
+                // Show radius circle
+                updateRadiusCircle();
+            }
+            
+            // Update marker position
+            function updateMarkerPosition(lat, lng) {
+                currentLat = lat;
+                currentLng = lng;
+                marker.setLatLng([lat, lng]);
+                updateRadiusCircle();
+            }
+            
+            // Add/update radius circle
+            let radiusCircle;
+            function updateRadiusCircle() {
+                if (radiusCircle) {
+                    map.removeLayer(radiusCircle);
+                }
+                
+                radiusCircle = L.circle([currentLat, currentLng], {
+                    color: '#381D2A',
+                    fillColor: '#381D2A',
+                    fillOpacity: 0.2,
+                    radius: currentRadius * 1000 // Convert km to meters
+                }).addTo(map);
+            }
+            
+            // Initialize UI controls
+            function initControls() {
+                // Radius slider
+                const radiusSlider = document.getElementById('radiusSlider');
+                const radiusValue = document.getElementById('radiusValue');
+                
+                radiusSlider.addEventListener('input', function() {
+                    currentRadius = parseInt(this.value);
+                    radiusValue.textContent = currentRadius;
+                    updateRadiusCircle();
+                });
+                
+                // Use my location button
+                const useMyLocationBtn = document.getElementById('useMyLocation');
+                const locationStatus = document.getElementById('locationStatus');
+                
+                useMyLocationBtn.addEventListener('click', function() {
+                    if ("geolocation" in navigator) {
+                        locationStatus.innerHTML = '<div class="alert alert-info">Getting your location...</div>';
+                        
+                        navigator.geolocation.getCurrentPosition(function(position) {
+                            const lat = position.coords.latitude;
+                            const lng = position.coords.longitude;
+                            
+                            updateMarkerPosition(lat, lng);
+                            map.setView([lat, lng], 10);
+                            
+                            locationStatus.innerHTML = '<div class="alert alert-success">Location found!</div>';
+                            setTimeout(() => {
+                                locationStatus.innerHTML = '';
+                            }, 3000);
+                        }, function(error) {
+                            let errorMsg = 'Unable to access your location. ';
+                            
+                            switch(error.code) {
+                                case error.PERMISSION_DENIED:
+                                    errorMsg += 'Please allow location access to use this feature.';
+                                    break;
+                                case error.POSITION_UNAVAILABLE:
+                                    errorMsg += 'Location information is unavailable.';
+                                    break;
+                                case error.TIMEOUT:
+                                    errorMsg += 'The request to get location timed out.';
+                                    break;
+                                default:
+                                    errorMsg += 'An unknown error occurred.';
+                                    break;
+                            }
+                            
+                            locationStatus.innerHTML = `<div class="alert alert-danger">${errorMsg}</div>`;
+                        });
+                    } else {
+                        locationStatus.innerHTML = '<div class="alert alert-danger">Geolocation is not supported by your browser.</div>';
+                    }
+                });
+                
+                // Search location
+                const searchLocationInput = document.getElementById('searchLocation');
+                const searchLocationBtn = document.getElementById('searchLocationBtn');
+                
+                function searchLocation() {
+                    const searchTerm = searchLocationInput.value.trim();
+                    if (searchTerm === '') return;
+                    
+                    locationStatus.innerHTML = '<div class="alert alert-info">Searching location...</div>';
+                    
+                    // Use Nominatim API for geocoding
+                    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchTerm)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.length > 0) {
+                                const result = data[0];
+                                const lat = parseFloat(result.lat);
+                                const lng = parseFloat(result.lon);
+                                
+                                updateMarkerPosition(lat, lng);
+                                map.setView([lat, lng], 10);
+                                
+                                locationStatus.innerHTML = '<div class="alert alert-success">Location found!</div>';
+                                setTimeout(() => {
+                                    locationStatus.innerHTML = '';
+                                }, 3000);
+                            } else {
+                                locationStatus.innerHTML = '<div class="alert alert-warning">No results found. Try a different search term.</div>';
+                            }
+                        })
+                        .catch(error => {
+                            locationStatus.innerHTML = `<div class="alert alert-danger">Error searching for location: ${error.message}</div>`;
+                        });
+                }
+                
+                searchLocationBtn.addEventListener('click', searchLocation);
+                searchLocationInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        searchLocation();
+                        e.preventDefault();
+                    }
+                });
+                
+                // Find sightings button
+                const findSightingsBtn = document.getElementById('findSightings');
+                findSightingsBtn.addEventListener('click', fetchNearbySightings);
+            }
+            
+            // Add these variables at the top of your script:
+            let allSightings = []; // Store all sightings
+            let currentPage = 1;
+            const sightingsPerPage = 9; // Show 9 cards per page (3x3 grid)
+            
+            // Modify the fetchNearbySightings and displaySightings functions:
+            // Fetch nearby sightings from API
+            async function fetchNearbySightings() {
+                const loadingIndicator = document.getElementById('loadingIndicator');
+                const sightingsResults = document.getElementById('sightingsResults');
+                
+                loadingIndicator.classList.remove('d-none');
+                
+                try {
+                    const response = await fetch(`/api/nearbysightings?lat=${currentLat}&lng=${currentLng}&radius=${currentRadius}`);
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch sightings');
+                    }
+                    
+                    allSightings = await response.json();
+                    
+                    // Sort sightings by date (newest first)
+                    allSightings.sort((a, b) => {
+                        return new Date(b.observationDate) - new Date(a.observationDate);
+                    });
+                    
+                    // Reset to first page when new results are loaded
+                    currentPage = 1;
+                    
+                    displaySightings();
+                } catch (error) {
+                    sightingsResults.innerHTML = `
+                        <div class="col-12">
+                            <div class="alert alert-danger">
+                                <i class="bi bi-exclamation-circle me-2"></i>
+                                Error fetching nearby sightings: ${error.message}
+                            </div>
+                        </div>
+                    `;
+                } finally {
+                    loadingIndicator.classList.add('d-none');
+                }
+            }
+            
+            // Display sightings on the map and in the list
+            function displaySightings() {
+                const sightingsResults = document.getElementById('sightingsResults');
+                
+                // Clear existing sightings markers
+                sightingsLayer.clearLayers();
+                
+                if (allSightings.length === 0) {
+                    sightingsResults.innerHTML = `
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle me-2"></i>
+                                No recent bird sightings found in this area. Try increasing the radius or choosing a different location.
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Calculate pagination
+                const totalPages = Math.ceil(allSightings.length / sightingsPerPage);
+                const startIndex = (currentPage - 1) * sightingsPerPage;
+                const endIndex = Math.min(startIndex + sightingsPerPage, allSightings.length);
+                const currentSightings = allSightings.slice(startIndex, endIndex);
+                
+                // Create HTML for list
+                let resultsHtml = '';
+                
+                // Add all markers to the map regardless of pagination
+                allSightings.forEach(sighting => {
+                    // Add marker to map
+                    const sightingMarker = L.marker([sighting.latitude, sighting.longitude], {
+                        icon: storkDorkIcon
+                    }).bindPopup(`
+                        <strong>
+                            <a href="${sighting.birdId ? `/Bird/Details/${sighting.birdId}` : `/search/birds?searchTerm=${encodeURIComponent(sighting.commonName)}&searchType=name`}">
+                                            ${sighting.commonName}
+                            </a>
+                        </strong><br>
+                        <em>${sighting.scientificName}</em><br>
+                        Seen on: ${formatDate(sighting.observationDate)}<br>
+                        <strong>Location:</strong> ${sighting.locationName}<br>
+                        ${sighting.count ? 'Count: ' + sighting.count : ''}
+                    `);
+                    
+                    sightingsLayer.addLayer(sightingMarker);
+                });
+                
+                // Add card display for current page only
+                currentSightings.forEach(sighting => {
+                    const formattedDate = formatDate(sighting.observationDate);
+                    
+                    resultsHtml += `
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="card h-100" style="background-color: #fff8f0; border: 2px solid #381D2A; border-radius: 10px; overflow: hidden;">
+                                <div class="card-header" style="background-color: rgba(170, 189, 140, 0.3);">
+                                    <h6 class="mb-0" style="color: #381D2A;">${sighting.commonName}</h6>
+                                    <small class="text-muted"><em>${sighting.scientificName}</em></small>
+                                </div>
+                                <div class="card-body">
+                                    <p class="mb-2">
+                                        <i class="bi bi-geo-alt-fill me-2" style="color: #381D2A;"></i>
+                                        ${sighting.locationName}
+                                    </p>
+                                    <p class="mb-2">
+                                        <i class="bi bi-calendar-event me-2" style="color: #381D2A;"></i>
+                                        ${formattedDate}
+                                    </p>
+                                    ${sighting.count ? `
+                                        <p class="mb-0">
+                                            <i class="bi bi-123 me-2" style="color: #381D2A;"></i>
+                                            Count: ${sighting.count}
+                                        </p>
+                                    ` : ''}
+                                </div>
+                                <div class="card-footer" style="background-color: rgba(242, 248, 219, 0.5); border-top: 1px solid #381D2A;">
+                                    <a href="${sighting.birdId ? `/Bird/Details/${sighting.birdId}` : `/search/birds?searchTerm=${encodeURIComponent(sighting.commonName)}&searchType=name`}" 
+                                       class="storkdork-button btn-sm">
+                                        <i class="bi bi-search me-1"></i> View Bird Details
+                                    </a>
+                                    <button class="btn btn-outline-secondary btn-sm float-end show-on-map" 
+                                            data-lat="${sighting.latitude}" data-lng="${sighting.longitude}">
+                                        <i class="bi bi-pin-map-fill"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                // Add pagination controls
+                if (totalPages > 1) {
+                    resultsHtml += `
+                        <div class="col-12">
+                            <div class="d-flex justify-content-center mt-4">
+                                <nav aria-label="Sightings pagination">
+                                    <ul class="pagination pagination-storkdork">
+                                        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                                            <button class="page-link" data-page="prev" aria-label="Previous">
+                                                <span aria-hidden="true">&laquo;</span>
+                                            </button>
+                                        </li>
+                    `;
+                    
+                    // Generate page numbers
+                    for (let i = 1; i <= totalPages; i++) {
+                        resultsHtml += `
+                            <li class="page-item ${i === currentPage ? 'active' : ''}">
+                                <button class="page-link" data-page="${i}">${i}</button>
+                            </li>
+                        `;
+                    }
+                    
+                    resultsHtml += `
+                                        <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                                            <button class="page-link" data-page="next" aria-label="Next">
+                                                <span aria-hidden="true">&raquo;</span>
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                            <div class="text-center text-muted mt-2">
+                                Showing ${startIndex + 1}-${endIndex} of ${allSightings.length} sightings
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Update results container
+                sightingsResults.innerHTML = resultsHtml;
+                
+                // Add event listeners for pagination
+                document.querySelectorAll('.pagination button').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const pageAction = this.dataset.page;
+                        
+                        if (pageAction === 'prev') {
+                            if (currentPage > 1) currentPage--;
+                        } else if (pageAction === 'next') {
+                            if (currentPage < totalPages) currentPage++;
+                        } else {
+                            currentPage = parseInt(pageAction);
+                        }
+                        
+                        displaySightings();
+                        
+                        // Scroll back to top of results
+                        document.querySelector('.storkdork-card').scrollIntoView({ behavior: 'smooth' });
+                    });
+                });
+                
+                // Add event listeners for "Show on Map" buttons
+                document.querySelectorAll('.show-on-map').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const lat = parseFloat(this.dataset.lat);
+                        const lng = parseFloat(this.dataset.lng);
+                        map.setView([lat, lng], 14);
+                        
+                        // Find and open the popup for this marker
+                        sightingsLayer.eachLayer(layer => {
+                            const markerLatLng = layer.getLatLng();
+                            if (markerLatLng.lat === lat && markerLatLng.lng === lng) {
+                                layer.openPopup();
+                            }
+                        });
+                    });
+                });
+            }
+            
+            // Helper function to format dates
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            }
+            
+            // Initialize everything
+            initMap();
+            initControls();
+            
+            // Add debounce to map movement
+            let mapMoveTimeout;
+            map.on('moveend', function() {
+                clearTimeout(mapMoveTimeout);
+                mapMoveTimeout = setTimeout(() => {
+                    // Optional: Auto-update sightings when map is moved
+                    // Uncomment the next line if you want this behavior
+                    // fetchNearbySightings();
+                }, 1000); // 1 second delay
+            });
+            
+            // Initial fetch of nearby sightings
+            setTimeout(() => {
+                fetchNearbySightings();
+            }, 500);
+        });
+    </script>
+}

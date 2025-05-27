@@ -21,7 +21,7 @@
             }
         </div>
     </div>
-    <div class="col-12">
+    <div class="col-6">
         <form method="post" enctype="multipart/form-data" asp-page-handler="UploadImage">
             <div class="form-group mb-3">
                 <label for="profileImage" class="form-label descriptive-text">Upload New Profile Image</label>
@@ -35,7 +35,28 @@
             <button type="submit" class="btn storkdork-button">Remove Profile Image</button>
         </form>
     </div>
+    <div class="col-md-6">
+        <div class="card storkdork-card mb-4">
+            <div class="card-header descriptive-text">
+                Privacy Settings
+            </div>
+            <div class="card-body">
+                <form id="settings-form" method="post" asp-page-handler="SaveSettings">
+                    <input type="hidden" asp-for="UserSettings.Id" />
+                    <input type="hidden" asp-for="UserSettings.SdUserId" />
 
+                    <div class="form-check mb-2">
+                        <input type="checkbox" asp-for="UserSettings.AnonymousSightings" class="form-check-input" id="anonymous-birder" />
+                        <label asp-for="UserSettings.AnonymousSightings" class="form-check-label">
+                            I want my sightings to be anonymous
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn storkdork-button">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
     <div class="col-md-6">
         <div class="card mb-4 storkdork-card">
             <div class="card-header descriptive-text">

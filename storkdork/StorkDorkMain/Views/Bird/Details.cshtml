@@ -2,22 +2,22 @@
 @model StorkDorkMain.Models.BirdDetailsViewModel
 
 <div class="container mt-4">
-    <!-- First row: Bird info (photos + taxonomy + range) -->
+    <!-- First row: Bird info (photos + info/range) -->
     <div class="row mb-5">
         <!-- Photos column -->
         <div class="col-md-4">
-            <div class="card"> 
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4>Photos</h4>
+            <div class="storkdork-card h-100"> 
+                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #aabd8c; color: #fcf2e0;">
+                    <h4 class="descriptive-text mb-0">Photos</h4>
                     @if (User.Identity.IsAuthenticated)
                     {
-                    <button class="btn btn-outline-primary btn-sm" type="button" 
+                    <button class="btn storkdork-button btn-sm" type="button" 
                         data-bs-toggle="collapse" data-bs-target="#photoSubmissionForm">
                         Submit Photo
                     </button>
                     }
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4">
                     @if (Model.Bird.Photos == null || !Model.Bird.Photos.Any())
                     {
                     <img src="@Model.ImageUrl" alt="@Model.Bird.CommonName" 
@@ -64,89 +64,90 @@
 
         <!-- Bird info column -->
         <div class="col-md-8">
-            <h1>@Model.Bird.CommonName</h1>
-            <h3><em>@Model.Bird.ScientificName</em></h3>
-            
-            <div class="card mt-3">
-                <div class="card-header">
-                    <h4>Taxonomy</h4>
+            <div class="storkdork-card h-100">
+                <div class="card-header" style="background-color: #aabd8c; color: #fcf2e0;">
+                    <div class="d-flex flex-wrap justify-content-between align-items-start">
+                        <div class="bird-names">
+                            <h2 class="descriptive-text m-1">@Model.Bird.CommonName</h2>
+                            <h5 class="mb-1"><em>@Model.Bird.ScientificName</em></h5>
+                        </div>
+                        <div class="taxonomy-info text-end d-flex flex-column align-items-end mt-1">
+                            <span class="badge mb-2" style="background-color: rgba(242, 248, 219, 0.7); color: #381D2A; font-size: 1rem; font-weight: 500; padding: 6px 12px;">
+                                Order: <a href="@Url.Action("Order", "Taxonomy", new { order = Model.Bird.Order })" 
+                                    class="hyperlink-style">@Model.Bird.Order</a>
+                            </span>
+                            <span class="badge" style="background-color: rgba(242, 248, 219, 0.7); color: #381D2A; font-size: 1rem; font-weight: 500; padding: 6px 12px;">
+                                Family: <a href="@Url.Action("Family", "Taxonomy", new { family = Model.Bird.FamilyScientificName })" 
+                                    class="hyperlink-style">@Model.Bird.FamilyCommonName</a>
+                            </span>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <dl class="row">
-                        <dt class="col-sm-3">Order</dt>
-                        <dd class="col-sm-9">
-                            <a href="@Url.Action("Order", "Taxonomy", new { order = Model.Bird.Order })">@Model.Bird.Order</a>
-                        </dd>
-                        
-                        <dt class="col-sm-3">Family</dt>
-                        <dd class="col-sm-9">
-                            <a href="@Url.Action("Family", "Taxonomy", new { family = Model.Bird.FamilyScientificName })">
-                                @Model.Bird.FamilyCommonName (@Model.Bird.FamilyScientificName)
-                            </a>
-                        </dd>
-                    </dl>
-                </div>
-            </div>
 
-            <!-- Range info and submission form -->
-            <div class="card mt-3">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4>Range</h4>
-                    @if (User.Identity.IsAuthenticated)
-                    {
-                        <button class="btn btn-outline-primary btn-sm" type="button" 
-                                data-bs-toggle="collapse" data-bs-target="#rangeSubmissionForm">
-                            Submit Range Information
-                        </button>
-                    }
-                </div>
-                <div class="card-body">
-                    @if (!string.IsNullOrEmpty(Model.Bird.Range))
-                    {
-                        <p>@Model.Bird.Range</p>
-                    }
-                    else
-                    {
-                        <p class="text-muted">No range information available for this bird yet. 
-                            @if (!User.Identity.IsAuthenticated)
+                <div class="card-body p-4 d-flex flex-column" style="height: calc(100% - 80px);">
+                    <!-- Range info section -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h4 class="descriptive-text">Range</h4>
+                            @if (User.Identity.IsAuthenticated)
                             {
-                                <span>Please <a asp-area="Identity" asp-page="/Account/Login">log in</a> to submit range information.</span>
+                                <button class="btn storkdork-button btn-sm" type="button" 
+                                        data-bs-toggle="collapse" data-bs-target="#rangeSubmissionForm">
+                                    Submit Range Information
+                                </button>
                             }
-                        </p>
-                    }
+                        </div>
+                        
+                        @if (!string.IsNullOrEmpty(Model.Bird.Range))
+                        {
+                            <p>@Model.Bird.Range</p>
+                        }
+                        else
+                        {
+                            <p class="text-muted">No range information available for this bird yet. 
+                                @if (!User.Identity.IsAuthenticated)
+                                {
+                                    <span>Please <a asp-area="Identity" asp-page="/Account/Login" class="hyperlink-style">log in</a> to submit range information.</span>
+                                }
+                            </p>
+                        }
+                    </div>
 
                     @if (User.Identity.IsAuthenticated)
                     {
                         <div class="collapse" id="rangeSubmissionForm">
-                            <div class="border-top pt-3">
+                            <div class="border-top pt-3 mb-4">
                                 <partial name="_RangeSubmissionForm" model='new RangeSubmissionViewModel { BirdId = Model.Bird.Id }' />
                             </div>
                         </div>
                     }
+                    
+                    <!-- Spacer to push buttons to bottom -->
+                    <div class="flex-grow-1"></div>
+                    
+                    <!-- Add to Bird Log Button -->
+                    <div class="d-flex flex-wrap gap-2 mt-auto mb-3">
+                        <a href="@Url.Action("Create", "BirdLog", new { commonName = Model.Bird.CommonName })" class="btn storkdork-button">
+                            <i class="bi bi-journal-plus me-2"></i> Log as a Bird Sighting
+                        </a>
+                        <button class="btn storkdork-button" id="addToChecklistBtn" data-bird-id="@Model.Bird.Id">
+                            <i class="bi bi-list-check me-2"></i> Add to Checklist
+                        </button>
+                    </div>
                 </div>
-            </div>
-            
-            <!-- Add to Bird Log Button -->
-            <div class="mt-3">
-                <a href="@Url.Action("Create", "BirdLog", new { commonName = Model.Bird.CommonName })" class="btn btn-success">
-                    Log as a Bird Sighting
-                </a>
-                <button class="btn btn-primary" id="addToChecklistBtn" data-bird-id="@Model.Bird.Id">
-                    Add to Checklist
-                </button>
             </div>
         </div>
     </div>
 
-    <!-- Second row: Map and related birds with more visual separation -->
+    <!-- Second row: Map and related birds -->
     <div class="row mt-4">
         <!-- Sightings map column -->
         <div class="col-md-6">
-            <div class="card h-100">
-                <div class="card-header bg-light">
-                    <h4>Recent Sightings</h4>
+            <div class="storkdork-card">
+                <div class="card-header" style="background-color: #aabd8c; color: #fcf2e0;">
+                    <h4 class="descriptive-text mb-0">Recent Sightings</h4>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4">
                     <div id="map" style="height: 400px;" class="rounded"></div>
                     <div id="sightingInfo" class="mt-2"></div>
                 </div>
@@ -157,11 +158,11 @@
         <div class="col-md-6">
             @if (Model.RelatedBirds != null)
             {
-                <div class="card h-100">
-                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                        <h4>Related Birds</h4>
+                <div class="storkdork-card">
+                    <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #aabd8c; color: #fcf2e0;">
+                        <h4 class="descriptive-text mb-0">Related Birds</h4>
                         <div class="dropdown">
-                            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <button class="btn storkdork-button dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown">
                                 Filter by Type: @(Model.CategoryFilter?.ToUpper() ?? "ALL")
                             </button>
                             <ul class="dropdown-menu">
@@ -177,21 +178,22 @@
                             </ul>
                         </div>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body p-4">
                         @if (Model.RelatedBirds.Any())
                         {
                             <div class="list-group">
                                 @foreach (var relatedBird in Model.RelatedBirds)
                                 {
                                     <a href="@Url.Action("Details", new { id = relatedBird.Bird.Id })" 
-                                       class="list-group-item list-group-item-action">
+                                       class="list-group-item list-group-item-action"
+                                       style="background-color: rgba(242, 248, 219, 0.4); border-color: #aabd8c; margin-bottom: 4px;">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div>
-                                                <strong>@relatedBird.Bird.CommonName</strong>
+                                                <strong style="color: #381D2A;">@relatedBird.Bird.CommonName</strong>
                                                 <br />
-                                                <small class="text-muted">@relatedBird.Bird.ScientificName</small>
+                                                <small style="color: #5A2E43;"><em>@relatedBird.Bird.ScientificName</em></small>
                                             </div>
-                                            <span class="badge bg-secondary">
+                                            <span class="badge" style="background-color: #aabd8c; color: #381D2A;">
                                                 @relatedBird.GetRelationType()
                                             </span>
                                         </div>
@@ -202,11 +204,12 @@
                             @if (Model.TotalPages > 1)
                             {
                                 <nav aria-label="Related birds pages" class="mt-3">
-                                    <ul class="pagination justify-content-center">
+                                    <ul class="pagination pagination-sm justify-content-center">
                                         @for (int i = 1; i <= Model.TotalPages; i++)
                                         {
                                             <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
-                                                <a class="page-link" href="@Url.Action("Details", new { id = Model.Bird.Id, categoryFilter = Model.CategoryFilter, page = i })">
+                                                <a class="page-link" href="@Url.Action("Details", new { id = Model.Bird.Id, categoryFilter = Model.CategoryFilter, page = i })"
+                                                   style="color: #381D2A; border-color: #aabd8c; @(i == Model.CurrentPage ? "background-color: #aabd8c;" : "")">
                                                     @i
                                                 </a>
                                             </li>
@@ -217,11 +220,11 @@
                         }
                         else
                         {
-                            <div class="alert alert-info">
+                            <div class="alert" style="background-color: rgba(242, 248, 219, 0.7); color: #381D2A; border-color: #aabd8c;">
                                 @if (Model.CategoryFilter != null)
                                 {
                                     <p>No related birds found in category '@Model.CategoryFilter.ToUpper()'. 
-                                       <a href="@Url.Action("Details", new { id = Model.Bird.Id })">View all related birds</a>
+                                       <a href="@Url.Action("Details", new { id = Model.Bird.Id })" class="hyperlink-style">View all related birds</a>
                                     </p>
                                 }
                                 else
@@ -237,15 +240,16 @@
     </div>
 </div>
 
+<!-- Checklist modal remains unchanged -->
 <div class="modal fade" id="checklistModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add <span id="birdName"></span> to Checklist</h5>
+            <div class="modal-header" style="background-color: #aabd8c; color: #fcf2e0;">
+                <h5 class="modal-title descriptive-text">Add <span id="birdName"></span> to Checklist</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form id="checklistForm">
-                <div class="modal-body">
+                <div class="modal-body" style="background-color: #fff8f0;">
                     <input type="hidden" id="selectedBirdId" />
                     <div class="mb-3">
                         <div class="form-check">
@@ -255,7 +259,7 @@
                                 Add to existing checklist
                             </label>
                         </div>
-                        <select class="form-select mt-2" id="existingChecklists" 
+                        <select class="form-select mt-2 input-style" id="existingChecklists" 
                                 aria-label="Select checklist" required>
                             <option value="">Loading checklists...</option>
                         </select>
@@ -269,13 +273,13 @@
                                 Create new checklist
                             </label>
                         </div>
-                        <input type="text" class="form-control mt-2" id="newChecklistName" 
+                        <input type="text" class="form-control mt-2 input-style" id="newChecklistName" 
                                placeholder="Enter checklist name" disabled required>
                     </div>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer" style="background-color: rgba(242, 248, 219, 0.4);">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="submit" class="btn storkdork-button">Save</button>
                 </div>
             </form>
         </div>
@@ -291,6 +295,10 @@
         let markers = [];
         const DEFAULT_LAT = 44.8485; // Monmouth, OR
         const DEFAULT_LNG = -123.2340;
+        const storkDorkIcon = L.icon({
+            iconUrl: '@Url.Content("~/images/map/StorkMarkerIcon.png")',
+            iconSize: [64, 64]
+        });
 
         document.addEventListener('DOMContentLoaded', function() {
             initializeMap();
@@ -350,6 +358,7 @@
                             .bindPopup(createPopupContent(sighting))
                             .addTo(map);
                         
+                        marker.setIcon(storkDorkIcon);
                         markers.push(marker);
                         bounds.extend([lat, lng]);
                     } catch (error) {
@@ -371,13 +380,19 @@
             const sightingDate = sighting.date ? new Date(sighting.date).toLocaleDateString() : 'Unknown Date';
             const locationInfo = sighting.notes?.split(',')[1]?.replace('Location:', '').trim() || 'Unknown Location';
             const birdCount = sighting.notes ? parseInt(sighting.notes.split(',')[0].replace('Count:', '')) || 0 : 0;
+            
             return `
-                <div>
-                    <h6>${'@Model.Bird.CommonName' || 'Unknown Bird'}</h6>
-                    <p>Date: ${sightingDate}</p>
-                    <p>Location: ${locationInfo}</p>
-                    <p>Count: ${birdCount}</p>
-                </div>
+            <div>
+                <strong>
+                    <a href="${sighting.birdId ? `/Bird/Details/${'@Model.Bird.CommonName'}` : `/search/birds?searchTerm=${encodeURIComponent('@Model.Bird.CommonName')}&searchType=name`}">
+                        ${'@Model.Bird.CommonName'}
+                    </a>
+                </strong><br>
+                <p>Date: ${sightingDate}</p>
+                <p>Location: ${locationInfo}</p>
+                <p>Count: ${birdCount}</p>
+                
+            </div>
             `;
         }
 

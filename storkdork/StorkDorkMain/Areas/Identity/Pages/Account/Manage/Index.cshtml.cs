@@ -36,6 +36,9 @@ namespace StorkDorkMain.Areas.Identity.Pages.Account.Manage
         [BindProperty]
         public InputModel Input { get; set; }
 
+        [BindProperty]
+        public UserSettings UserSettings {get;set;}
+
         public class InputModel
         {
             public string DisplayName { get; set; }
@@ -70,6 +73,9 @@ namespace StorkDorkMain.Areas.Identity.Pages.Account.Manage
                 int tier = _milestoneRepository.GetMilestoneTier(SightingsMade);
                 MilestoneTier = GetTierName(tier);
                 ProfileImagePath = sdUser?.ProfileImagePath;
+
+                // UserSettings
+                UserSettings = sdUser.UserSettings ?? new UserSettings { SdUserId = sdUser.Id };
             }
 
             return Page();
@@ -154,6 +160,38 @@ namespace StorkDorkMain.Areas.Identity.Pages.Account.Manage
                 sdUser.ProfileImagePath = null;
                 await _sdUserRepository.UpdateAsync(sdUser);
             }
+
+            return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostSaveSettingsAsync()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var sdUser = await _sdUserRepository.GetSDUserByIdentity(User);
+
+            if (sdUser == null)
+            {
+                return NotFound("User profile not found.");
+            }
+
+            // Update or create UserSettings
+            if (sdUser.UserSettings == null)
+            {
+                sdUser.UserSettings = new UserSettings
+                {
+                    SdUserId = sdUser.Id,
+                    AnonymousSightings = UserSettings.AnonymousSightings
+                };
+            }
+            else
+            {
+                sdUser.UserSettings.AnonymousSightings = UserSettings.AnonymousSightings;
+            }
+
+            await _sdUserRepository.UpdateAsync(sdUser);
+
+            // Optionally add a success message
+            TempData["StatusMessage"] = "Settings updated successfully.";
 
             return RedirectToPage();
         }

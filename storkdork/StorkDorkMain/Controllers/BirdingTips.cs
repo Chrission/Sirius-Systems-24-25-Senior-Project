@@ -27,14 +27,12 @@ namespace StorkDorkMain.Controllers
         public BirdingTipsController(StorkDorkDbContext context)
         {
             _context = context;
-
         }
 
         [HttpGet]
 
         public async Task<IActionResult> Index()
         {
-
             return View();
 
         }

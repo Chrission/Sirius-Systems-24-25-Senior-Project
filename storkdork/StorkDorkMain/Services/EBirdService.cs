@@ -6,6 +6,7 @@ namespace StorkDorkMain.Services;
 public interface IEBirdService
 {
     Task<IEnumerable<Sighting>> GetNearestSightings(int birdId, double lat, double lng, int maxResults = 10);
+    Task<IEnumerable<NearbySighting>> GetNearbySightings(double lat, double lng, int radius = 25);
 }
 
 public class EBirdService : IEBirdService
@@ -74,6 +75,69 @@ public class EBirdService : IEBirdService
         {
             Console.WriteLine($"Error in GetNearestSightings: {ex}");
             return new List<Sighting>();
+        }
+    }
+
+    public async Task<IEnumerable<NearbySighting>> GetNearbySightings(double lat, double lng, int radius = 25)
+    {
+        try
+        {
+            var apiKey = _configuration["EBird:ApiKey"];
+            _httpClient.DefaultRequestHeaders.Clear();
+            _httpClient.DefaultRequestHeaders.Add("X-eBirdApiToken", apiKey);
+            
+            // Use the eBird recent nearby observations endpoint
+            var url = $"https://api.ebird.org/v2/data/obs/geo/recent?lat={lat}&lng={lng}&dist={radius}&back=30";
+            
+            var response = await _httpClient.GetAsync(url);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"eBird API error: {response.StatusCode}");
+                return new List<NearbySighting>();
+            }
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            var eBirdSightings = await JsonSerializer.DeserializeAsync<List<EBirdSighting>>(
+                await response.Content.ReadAsStreamAsync(),
+                options);
+
+            if (eBirdSightings == null)
+            {
+                return new List<NearbySighting>();
+            }
+
+            // Group by species to keep only the most recent sighting for each
+            return eBirdSightings
+                .GroupBy(s => s.SpeciesCode)
+                .Select(g => g.OrderByDescending(s => DateTime.Parse(s.ObservationDate)).First())
+                .Select(es => {
+                    // Try to find matching bird by species code
+                    var bird = _birdRepository.GetBirdBySpeciesCode(es.SpeciesCode);
+                    
+                    return new NearbySighting
+                    {
+                        SpeciesCode = es.SpeciesCode,
+                        BirdId = bird?.Id, // Add the BirdId if found
+                        CommonName = es.CommonName,
+                        ScientificName = es.ScientificName,
+                        LocationName = es.LocationName,
+                        ObservationDate = es.ObservationDate,
+                        Count = es.Count,
+                        Latitude = es.Latitude,
+                        Longitude = es.Longitude
+                    };
+                })
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in GetNearbySightings: {ex}");
+            return new List<NearbySighting>();
         }
     }
 }

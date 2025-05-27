@@ -182,5 +182,10 @@ namespace StorkDorkMain.DAL.Concrete
                 _ => query.OrderBy(b => b.CommonName) // default sort by name ascending
             };
         }
+
+        public Bird GetBirdBySpeciesCode(string speciesCode)
+        {
+            return _birds.FirstOrDefault(b => b.SpeciesCode == speciesCode);
+        }
     }
 }

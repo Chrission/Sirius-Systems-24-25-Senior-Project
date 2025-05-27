@@ -109,7 +109,6 @@ namespace StorkDorkMain.Controllers
                 .Distinct()
                 .ToListAsync();
 
-
             ViewBag.FamilyCommonNames = await _context.Birds
                 .Where(b => b.FamilyCommonName != null) // Ensure no null values
                 .Select(b => b.FamilyCommonName)
@@ -183,7 +182,6 @@ namespace StorkDorkMain.Controllers
         }
 
 
-
         // GET: BirdLog/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -254,7 +252,6 @@ namespace StorkDorkMain.Controllers
             ViewBag.DefaultLat = 45.5231; // Example default coordinates
             ViewBag.DefaultLng = -122.6765;
             ViewBag.DefaultZoom = 7;
-
             return View();
         }
 
@@ -609,7 +606,7 @@ namespace StorkDorkMain.Controllers
             }
 
 
-
+        
             return View(sighting);
         }
 
@@ -635,6 +632,7 @@ namespace StorkDorkMain.Controllers
         {
             return _context.Sightings.Any(e => e.Id == id);
         }
+        
 
 
         // this is the confirmation page so when a user successfully creates a logged sighting, they will be taken here

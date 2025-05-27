@@ -43,7 +43,7 @@ public class UserSettingsController : Controller
         if (settings.SdUserId != sdUser.Id)
             settings.SdUserId = sdUser.Id;
 
-        return View(settings);
+        return RedirectToAction("Index");
     }
 
     [HttpPost]
@@ -65,7 +65,7 @@ public class UserSettingsController : Controller
         if (updated == null)
             return NotFound("Settings not found.");
 
-        return RedirectToAction("Settings");
+        return RedirectToAction("Index", "HomeController");
     }
 
     // public IActionResult Settings()

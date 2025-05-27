@@ -3,9 +3,15 @@
 @section Styles {
     <link rel="stylesheet" href="~/css/map-page.css">
 } 
-
+@* <div class="card-footer bg-white">
+    <a href="@Url.Action("Index", "NearbySightings")" class="btn btn-outline-primary btn-sm">
+        <i class="fas fa-binoculars me-1"></i> View Nearby Bird Sightings
+    </a>
+    <small class="text-muted ms-2">See what others have spotted in this area</small>
+</div> *@
  <div class="m-0 p-0 map-page">
     <div id="map" class="d-flex leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom"></div>
- </div>
+</div>
+ 
 
 <script src="~/js/map/map.js"></script>
