@@ -37,12 +37,15 @@ function setupGeolocation() {
     if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(
             function(position) {
+                console.log("Geolocation success:", position.coords.latitude, position.coords.longitude);
                 map.setView([position.coords.latitude, position.coords.longitude], 13);
             },
             function(error) {
                 console.error("Geolocation error:", error.message);
             }
         );
+    } else {
+        console.warn("Geolocation not available in this browser.");
     }
 }
 
@@ -182,13 +185,19 @@ async function makeSightingMarkers(data, userId = null) {
 }
 
 async function updateSightingLocation(sightingId, country, subdivision) {
-    const payload = {
-        sightingId: sightingId, 
-        country: country || "Unknown", 
-        subdivision: subdivision || "Unknown"
-    };
+    // 1. Validate input
+    if (!sightingId || typeof sightingId !== "number") return;
+    if (!country || !subdivision) return;
+    if (country === "Unknown" && subdivision === "Unknown") return;
 
-    // console.log("Sending payload:", payload);
+    // Optionally: Prevent duplicate updates (pseudo-code, requires more logic)
+    // if (markers[sightingId]?.lastCountry === country && markers[sightingId]?.lastSubdivision === subdivision) return;
+
+    const payload = {
+        sightingId: sightingId,
+        country: country,
+        subdivision: subdivision
+    };
 
     try {
         const response = await fetch("/api/sighting/UpdateLocation", {
@@ -198,13 +207,16 @@ async function updateSightingLocation(sightingId, country, subdivision) {
         });
 
         if (!response.ok) {
-            // const errorText = await response.text();
-            // throw new Error(`Failed to update location: ${response.status} - ${errorText}`);
+            // Optionally log or handle error
+            return;
         }
 
-        // console.log(`Successfully updated location for sighting ${sightingId}`);
+        // Optionally: Store last updated values to prevent redundant updates
+        // markers[sightingId].lastCountry = country;
+        // markers[sightingId].lastSubdivision = subdivision;
+
     } catch (error) {
-        // console.error("Error updating sighting location:", error);
+        // Optionally log error
     }
 }
 
@@ -322,8 +334,11 @@ async function loadUserSightings() {
     }
 }
 
-window.onload = async function() {
+map.whenReady(() => {
     setupGeolocation();
+})
+
+window.onload = async function() {
     
     await loadUserSightings();
     
