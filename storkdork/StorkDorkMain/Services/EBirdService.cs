@@ -115,16 +115,22 @@ public class EBirdService : IEBirdService
             return eBirdSightings
                 .GroupBy(s => s.SpeciesCode)
                 .Select(g => g.OrderByDescending(s => DateTime.Parse(s.ObservationDate)).First())
-                .Select(es => new NearbySighting
-                {
-                    SpeciesCode = es.SpeciesCode,
-                    CommonName = es.CommonName,
-                    ScientificName = es.ScientificName,
-                    LocationName = es.LocationName,
-                    ObservationDate = es.ObservationDate,
-                    Count = es.Count,
-                    Latitude = es.Latitude,
-                    Longitude = es.Longitude
+                .Select(es => {
+                    // Try to find matching bird by species code
+                    var bird = _birdRepository.GetBirdBySpeciesCode(es.SpeciesCode);
+                    
+                    return new NearbySighting
+                    {
+                        SpeciesCode = es.SpeciesCode,
+                        BirdId = bird?.Id, // Add the BirdId if found
+                        CommonName = es.CommonName,
+                        ScientificName = es.ScientificName,
+                        LocationName = es.LocationName,
+                        ObservationDate = es.ObservationDate,
+                        Count = es.Count,
+                        Latitude = es.Latitude,
+                        Longitude = es.Longitude
+                    };
                 })
                 .ToList();
         }

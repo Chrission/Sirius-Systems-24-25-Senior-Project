@@ -14,6 +14,7 @@ namespace StorkDorkMain.Models
     public class NearbySighting
     {
         public string SpeciesCode { get; set; }
+        public int? BirdId { get; set; }
         public string CommonName { get; set; }
         public string ScientificName { get; set; }
         public string LocationName { get; set; }

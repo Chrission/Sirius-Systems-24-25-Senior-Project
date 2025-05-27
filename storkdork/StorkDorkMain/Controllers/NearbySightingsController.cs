@@ -50,6 +50,21 @@ namespace StorkDorkMain.Controllers
             return View(viewModel);
         }
 
+
+        [HttpGet]
+        public IActionResult FromLocation(decimal lat, decimal lng)
+        {
+            // Set up view model with given coordinates
+            var viewModel = new NearbySightingsViewModel
+            {
+                Radius = 25, // Default radius in km
+                DefaultLatitude = lat,
+                DefaultLongitude = lng
+            };
+            
+            return View("Index", viewModel);
+        }
+
         [HttpGet]
         [Route("api/nearbysightings")]
         public async Task<IActionResult> GetNearbySightings(double lat, double lng, int radius = 25)
@@ -67,7 +82,5 @@ namespace StorkDorkMain.Controllers
                 return BadRequest(new { error = ex.Message });
             }
         }
-
-        
     }
 }

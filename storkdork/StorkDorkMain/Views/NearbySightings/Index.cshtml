@@ -352,10 +352,14 @@
                     const sightingMarker = L.marker([sighting.latitude, sighting.longitude], {
                         icon: storkDorkIcon
                     }).bindPopup(`
-                        <strong>${sighting.commonName}</strong><br>
+                        <strong>
+                            <a href="${sighting.birdId ? `/Bird/Details/${sighting.birdId}` : `/search/birds?searchTerm=${encodeURIComponent(sighting.commonName)}&searchType=name`}">
+                                            ${sighting.commonName}
+                            </a>
+                        </strong><br>
                         <em>${sighting.scientificName}</em><br>
                         Seen on: ${formatDate(sighting.observationDate)}<br>
-                        Location: ${sighting.locationName}<br>
+                        <strong>Location:</strong> ${sighting.locationName}<br>
                         ${sighting.count ? 'Count: ' + sighting.count : ''}
                     `);
                     
@@ -390,7 +394,7 @@
                                     ` : ''}
                                 </div>
                                 <div class="card-footer" style="background-color: rgba(242, 248, 219, 0.5); border-top: 1px solid #381D2A;">
-                                    <a href="/search/birds?searchTerm=${encodeURIComponent(sighting.commonName)}&searchType=name" 
+                                    <a href="${sighting.birdId ? `/Bird/Details/${sighting.birdId}` : `/search/birds?searchTerm=${encodeURIComponent(sighting.commonName)}&searchType=name`}" 
                                        class="storkdork-button btn-sm">
                                         <i class="bi bi-search me-1"></i> View Bird Details
                                     </a>

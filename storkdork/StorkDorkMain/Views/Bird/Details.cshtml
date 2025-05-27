@@ -179,7 +179,6 @@
                         </div>
                     </div>
                     <div class="card-body p-4">
-                        <!-- Existing related birds content remains unchanged -->
                         @if (Model.RelatedBirds.Any())
                         {
                             <div class="list-group">
@@ -241,7 +240,6 @@
     </div>
 </div>
 
-<!-- Checklist modal remains unchanged -->
 <div class="modal fade" id="checklistModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -296,6 +294,10 @@
         let markers = [];
         const DEFAULT_LAT = 44.8485; // Monmouth, OR
         const DEFAULT_LNG = -123.2340;
+        const storkDorkIcon = L.icon({
+            iconUrl: '@Url.Content("~/images/map/StorkMarkerIcon.png")',
+            iconSize: [64, 64]
+        });
 
         document.addEventListener('DOMContentLoaded', function() {
             initializeMap();
@@ -355,6 +357,7 @@
                             .bindPopup(createPopupContent(sighting))
                             .addTo(map);
                         
+                        marker.setIcon(storkDorkIcon);
                         markers.push(marker);
                         bounds.extend([lat, lng]);
                     } catch (error) {
@@ -376,13 +379,19 @@
             const sightingDate = sighting.date ? new Date(sighting.date).toLocaleDateString() : 'Unknown Date';
             const locationInfo = sighting.notes?.split(',')[1]?.replace('Location:', '').trim() || 'Unknown Location';
             const birdCount = sighting.notes ? parseInt(sighting.notes.split(',')[0].replace('Count:', '')) || 0 : 0;
+            
             return `
-                <div>
-                    <h6>${'@Model.Bird.CommonName' || 'Unknown Bird'}</h6>
-                    <p>Date: ${sightingDate}</p>
-                    <p>Location: ${locationInfo}</p>
-                    <p>Count: ${birdCount}</p>
-                </div>
+            <div>
+                <strong>
+                    <a href="${sighting.birdId ? `/Bird/Details/${'@Model.Bird.CommonName'}` : `/search/birds?searchTerm=${encodeURIComponent('@Model.Bird.CommonName')}&searchType=name`}">
+                        ${'@Model.Bird.CommonName'}
+                    </a>
+                </strong><br>
+                <p>Date: ${sightingDate}</p>
+                <p>Location: ${locationInfo}</p>
+                <p>Count: ${birdCount}</p>
+                
+            </div>
             `;
         }
 
