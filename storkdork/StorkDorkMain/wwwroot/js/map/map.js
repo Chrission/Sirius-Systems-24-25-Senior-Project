@@ -37,12 +37,15 @@ function setupGeolocation() {
     if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(
             function(position) {
+                console.log("Geolocation success:", position.coords.latitude, position.coords.longitude);
                 map.setView([position.coords.latitude, position.coords.longitude], 13);
             },
             function(error) {
                 console.error("Geolocation error:", error.message);
             }
         );
+    } else {
+        console.warn("Geolocation not available in this browser.");
     }
 }
 
@@ -331,8 +334,11 @@ async function loadUserSightings() {
     }
 }
 
-window.onload = async function() {
+map.whenReady(() => {
     setupGeolocation();
+})
+
+window.onload = async function() {
     
     await loadUserSightings();
     
