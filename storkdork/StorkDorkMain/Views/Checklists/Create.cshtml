@@ -2,159 +2,246 @@
 
 @{
     ViewData["Title"] = "Create Checklist";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Create New Checklist</h1>
+<h1 class="mt-4 container text-center mb-5" style="color: #381D2A; font-family: 'Darumadrop One', sans-serif;">Create New Checklist</h1>
 
-<!-- Display validation errors -->
-<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card" style="border: 2px solid #AABD8C; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                <div class="card-header" style="background-color: #381D2A; color: #E9E3B4;">
+                    <h4 style="margin: 0; font-family: 'Darumadrop One', sans-serif;">Create Your Checklist</h4>
+                </div>
+                
+                <div class="card-body" style="background-color: #E9E3B4;">
+                    <form asp-action="Create" id="createChecklistForm">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="SdUserId" />
 
-<form asp-action="Create" id="createChecklistForm">
-    <!-- Hidden field to store the selected user's ID -->
-    <input type="hidden" asp-for="SdUserId" />
+                        <!-- Checklist Name -->
+                        <div class="form-group mb-4">
+                            <label asp-for="ChecklistName" class="form-label" style="color: #381D2A; font-weight: 600;">Checklist Name</label>
+                            <input asp-for="ChecklistName" class="form-control" 
+                                   style="border-color: #AABD8C; border-radius: 8px;"
+                                   placeholder="Type here to enter the name of your checklist" />
+                            <span asp-validation-for="ChecklistName" class="text-danger"></span>
+                        </div>
 
-    <div class="form-group">
-    <label asp-for="ChecklistName" class="control-label">Checklist Name</label>
-    <input asp-for="ChecklistName" class="form-control" placeholder="Type here to enter the name of your checklist" />
-    <span asp-validation-for="ChecklistName" class="text-danger"></span>
+                        <!-- Search bar for birds -->
+                        <div class="form-group mb-4 position-relative">
+                            <label class="form-label" style="color: #381D2A; font-weight: 600;">Search Birds</label>
+                            <input type="text" id="birdSearch" class="form-control" 
+                                   style="border-color: #AABD8C; border-radius: 8px;"
+                                   placeholder="Type to search birds..." />
+                            <div id="birdSearchResults" class="dropdown-menu" 
+                                 style="max-height: 300px; overflow-y: auto; width: 100%; 
+                                        background-color: #E9E3B4; border: 2px solid #AABD8C;
+                                        display: none; position: absolute; z-index: 1000; margin-top: 5px;"></div>
+                        </div>
+
+                        <!-- Selected birds list -->
+                        <div class="form-group">
+                            <label class="form-label" style="color: #381D2A; font-weight: 600;">Selected Birds</label>
+                            <ul id="selectedBirdsList" class="list-group" 
+                                style="max-height: 400px; overflow-y: auto; border-radius: 8px; margin-top: 20px;">
+                                <!-- Birds will be added here -->
+                            </ul>
+                        </div>
+
+                        <!-- Hidden field container -->
+                        <div id="selectedBirdsContainer"></div>
+
+                        <!-- Form buttons -->
+                        <div class="form-group mt-4 d-flex gap-3">
+                            <button type="submit" class="btn cta-button flex-grow-1" 
+                                    style="font-family: 'Darumadrop One', sans-serif;">
+                                Create
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary flex-grow-1"
+                               style="background-color: #381D2A; color: #E9E3B4; border: none;">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-    <!-- Search bar for birds -->
-    <div class="form-group">
-        <label>Search For Birds:</label>
-        <input type="text" id="birdSearch" class="form-control" placeholder="Type to search birds..." />
-        <div id="birdSearchResults" class="dropdown-menu" style="display: none;"></div>
-    </div>
-
-    <!-- List of selected birds -->
-    <div class="form-group">
-        <label>Selected Birds:</label>
-        <ul id="selectedBirdsList" class="list-group"></ul>
-    </div>
-
-    <!-- Hidden field to store selected bird IDs -->
-    <div id="selectedBirdsContainer"></div>
-
-    <div class="form-group">
-        <input type="submit" value="Create" class="btn btn-primary" />
-        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-    </div>
-</form>
-
-
 
 @section Scripts {
     <script>
         $(document).ready(function () {
-            const birdSearch = $('#birdSearch');
-            const birdSearchResults = $('#birdSearchResults');
-            const selectedBirdsList = $('#selectedBirdsList');
-            const selectedBirdsInput = $('#selectedBirds');
-
-            // List to store selected birds (with ID, common name, and scientific name)
+            // Array to keep track of birds selected by the user
             let selectedBirds = [];
+            // Maximum number of search results to show
+            const maxResults = 14;
+            // Current search input value
+            let currentQuery = '';
 
-            // Fetch birds as the user types
-            birdSearch.on('input', function () {
-                const query = $(this).val();
-                if (query.length >= 2) { // Only search if the query has at least 2 characters
-                    $.get('/Checklists/SearchBirds', { query: query }, function (data) {
-                        birdSearchResults.empty();
-                        if (data.length > 0) {
-                            data.forEach(function (bird) {
-                                const birdItem = $(`
-                                    <div class="dropdown-item" data-bird-id="${bird.id}" data-bird-common-name="${bird.commonName}" data-bird-scientific-name="${bird.scientificName}">
-                                        ${bird.commonName} (${bird.scientificName})
-                                    </div>
-                                `);
-                                birdItem.on('click', function () {
-                                    addBirdToList(bird);
-                                });
-                                birdSearchResults.append(birdItem);
-                            });
-                            birdSearchResults.show();
-                        } else {
-                            birdSearchResults.hide();
-                        }
+            // Create and add an error message box that shows when user adds a duplicate bird
+            const errorToast = $(`
+                <div id="errorToast" style="position: fixed; bottom: 20px; right: 20px; 
+                        padding: 15px 25px; background-color: #F39B6D; color: #381D2A; 
+                        border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+                        display: none; z-index: 9999; font-family: 'Darumadrop One', sans-serif;">
+                    This bird is already in your checklist!
+                </div>
+            `);
+            $('body').append(errorToast);
+
+            // When user types in the bird search box
+            $('#birdSearch').on('input', function () {
+                currentQuery = $(this).val();
+
+                // Only search if input has 2 or more characters
+                if (currentQuery.length >= 2) {
+                    // Get search results from the server
+                    $.get('/Checklists/SearchBirds', { query: currentQuery }, function (data) {
+                        // Show only the first maxResults birds in the list
+                        renderSearchResults(data.slice(0, maxResults));
                     });
                 } else {
-                    birdSearchResults.hide();
-                }
-            });
-            // Close dropdown when clicking outside
-            $(document).on('click', function (event) {
-                if (!$(event.target).closest(birdSearchResults).length && !$(event.target).closest(birdSearch).length) {
-                    birdSearchResults.hide();
+                    // Hide results if query is too short
+                    $('#birdSearchResults').hide();
                 }
             });
 
-            // Add bird to the selected list
-            function addBirdToList(bird) {
-                if (!selectedBirds.some(b => b.id === bird.id)) { // Prevent duplicates
-                    selectedBirds.push({
-                        id: bird.id,
-                        commonName: bird.commonName,
-                        scientificName: bird.scientificName
+            // Display the search results in the dropdown
+            function renderSearchResults(data) {
+                const birdSearchResults = $('#birdSearchResults').empty();
+
+                // Show results only if there are matches and query is long enough
+                if (data.length > 0 && currentQuery.length >= 2) {
+                    data.forEach(bird => {
+                        // Check if this bird is already selected
+                        const isSelected = selectedBirds.some(b => b.id === bird.id);
+                        // Create a dropdown item for each bird
+                        const birdItem = $(`
+                            <div class="dropdown-item" 
+                                style="cursor: pointer; color: #381D2A; 
+                                        ${isSelected ? 'background-color: #AABD8C;' : ''}"
+                                data-bird-id="${bird.id}">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>${bird.commonName}</strong><br>
+                                        <em>${bird.scientificName}</em>
+                                    </div>
+                                    ${isSelected ? 
+                                        '<span class="text-muted">Added</span>' : 
+                                        '<button type="button" class="btn btn-sm add-bird-btn" style="background-color: #F39B6D; color: #381D2A;">+ Add</button>'}
+                                </div>
+                            </div>
+                        `);
+
+                        // If bird not already selected, set up button to add it on click
+                        if (!isSelected) {
+                            birdItem.find('.add-bird-btn').on('click', function (e) {
+                                e.stopPropagation(); // Prevent dropdown closing
+                                addBirdToList(bird);
+                            });
+                        }
+
+                        birdSearchResults.append(birdItem);
                     });
-                    updateSelectedBirdsList();
-                    updateHiddenInputs(); // Update hidden inputs
+                    birdSearchResults.show(); // Show the results dropdown
+                } else {
+                    birdSearchResults.hide(); // Hide if no results
                 }
             }
 
-            // Remove bird from the selected list
-            function removeBirdFromList(birdId) {
-                birdId = parseInt(birdId);
-                selectedBirds = selectedBirds.filter(b => b.id !== birdId);
-                updateSelectedBirdsList();
-                updateHiddenInputs(); // Update hidden inputs
+            // Add bird to the selected list if not already there
+            function addBirdToList(bird) {
+                if (selectedBirds.some(b => b.id === bird.id)) {
+                    showErrorToast(); // Show error if duplicate
+                    return;
+                }
+                
+                // Add bird to the list
+                selectedBirds.push({
+                    id: bird.id,
+                    commonName: bird.commonName,
+                    scientificName: bird.scientificName
+                });
+
+                refreshUI(); // Update the UI with new list
+
+                // Keep showing search results after adding a bird
+                $('#birdSearch').trigger('input');
             }
 
-            // Update the displayed list of selected birds
+            // Show the duplicate error message briefly
+            function showErrorToast() {
+                errorToast
+                    .fadeIn(300)
+                    .delay(2000)
+                    .fadeOut(300);
+            }
+
+            // Update the visible list and hidden inputs after changes
+            function refreshUI() {
+                updateSelectedBirdsList();
+                updateHiddenInputs();
+            }
+
+            // Show the selected birds in a list with a remove button
             function updateSelectedBirdsList() {
-                selectedBirdsList.empty();
-                selectedBirds.forEach(function (bird) {
+                const selectedBirdsList = $('#selectedBirdsList').empty();
+
+                selectedBirds.forEach(bird => {
                     const birdItem = $(`
-                        <li class="list-group-item">
-                            <strong>${bird.commonName}</strong><br />
-                            <em>${bird.scientificName}</em>
-                            <button type="button" class="btn btn-sm btn-danger float-right remove-bird" data-bird-id="${bird.id}">×</button>
+                        <li class="list-group-item d-flex align-items-center justify-content-between"
+                            style="background-color: rgba(170, 189, 140, 0.2); border-color: #AABD8C;">
+                            <div>
+                                <strong style="color: #381D2A;">${bird.commonName}</strong><br>
+                                <em style="color: #3E6990;">${bird.scientificName}</em>
+                            </div>
+                            <button type="button" 
+                                    class="btn btn-sm remove-bird-btn"
+                                    style="background-color: #F39B6D; color: #381D2A; border: none;"
+                                    data-bird-id="${bird.id}">
+                                Remove
+                            </button>
                         </li>
                     `);
 
-                    birdItem.find('.remove-bird').on('click', function () {
-                        const birdId = $(this).data('bird-id');
-                        removeBirdFromList(birdId);
-                    });
                     selectedBirdsList.append(birdItem);
+                });
+
+                // Remove bird when remove button is clicked
+                $('.remove-bird-btn').on('click', function () {
+                    const birdId = $(this).data('bird-id');
+                    selectedBirds = selectedBirds.filter(b => b.id !== birdId);
+                    refreshUI();
                 });
             }
 
-            // Update the hidden input with selected bird IDs
+            // Create hidden inputs for form submission with selected bird IDs
             function updateHiddenInputs() {
-                const container = $('#selectedBirdsContainer');
-                container.empty(); // Clear existing inputs
-
-                selectedBirds.forEach(function (bird) {
-                    container.append(
+                $('#selectedBirdsContainer').empty();
+                selectedBirds.forEach(bird => {
+                    $('#selectedBirdsContainer').append(
                         `<input type="hidden" name="selectedBirds" value="${bird.id}" />`
                     );
                 });
-                console.log("Selected Bird IDs:", selectedBirds.map(b => b.id).join(', ')); // Debugging
             }
 
-            // Handle form submission
+            // Prevent form submission if no birds are selected
             $('#createChecklistForm').on('submit', function (e) {
-                console.log("Form submitted"); // Debugging
-                console.log("SdUserId:", $('#SdUserId').val()); // Debugging
-                console.log("Selected Birds:", $('#selectedBirds').val()); // Debugging
-
                 if (selectedBirds.length === 0) {
-                    e.preventDefault(); // Prevent form submission if no birds are selected
+                    e.preventDefault();
                     alert("Please select at least one bird.");
+                }
+            });
+
+            // Hide search results dropdown if clicking outside search or results area
+            $(document).on('click', function (event) {
+                if (!$(event.target).closest('#birdSearchResults, #birdSearch').length) {
+                    $('#birdSearchResults').hide();
                 }
             });
         });
     </script>
 }
-
-<!-- Notes -->

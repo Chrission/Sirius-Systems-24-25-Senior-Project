@@ -10,22 +10,13 @@
             <h1>@Model.DisplayName's Milestones:</h1>
         </div>
         <div class="col-md-8 mx-auto text-center">
-            @* <div id="statistics">
-                <h2 class="text-start">Statistics:</h2>
-            </div>
-
-            <hr class="my-4" style="border-color: white;">
-
-            <div id="milestones">
-                <h2 class="text-start">Milestones:</h2>
-            </div> *@
-            <div class="card mt-3">
+            <div class="card mt-3 storkdork-card">
                 <div class="card-header">
-                    <h4>StorkDork Statistics:</h4>
+                    <h4 class="descriptive-text">StorkDork Statistics:</h4>
                 </div>
                 <div class="card-body">
                     <dl class="row">
-                        <dt class="col-sm-3">Sightings Made:</dt>
+                        <dt class="col-sm-3 descriptive-text">Sightings Made:</dt>
                         @if (Model.Milestone.SightingsMade > 0)
                         {
                             <dd class="col-sm-9">You've made @Model.Milestone.SightingsMade sightings so far!
@@ -48,7 +39,7 @@
                             <dd class="col-sm-9"> Make your first sighting today!</dd>
                         }
 
-                        <dt class="col-sm-3">Photos Contributed:</dt>
+                        <dt class="col-sm-3 descriptive-text">Photos Contributed:</dt>
                         @if (Model.Milestone.PhotosContributed > 0)
                         {
                             <dd class="col-sm-9">You've uploaded @Model.Milestone.PhotosContributed verified photos!
@@ -69,17 +60,17 @@
 
                         @if (Model.Milestone.PhotosContributed <= 0)
                         {
-                            <dd class="col-sm-9"> upload your first photo today!</dd>
+                            <dd class="col-sm-9"> Upload your first photo today!</dd>
                         }
 
                         @if (Model.MostSpottedBird != null)
                         {
-                            <dt class="col-sm-3">Most Spotted Bird:</dt>
+                            <dt class="col-sm-3 descriptive-text">Most Spotted Bird:</dt>
                             <dd class="col-sm-9">Your most spotted bird is the @Model.MostSpottedBird.CommonName</dd>
                         }
                         @if (Model.MostSightingsInDay != null)
                         {
-                            <dt class="col-sm-3">Most Spottings in a Day:</dt>
+                            <dt class="col-sm-3 descriptive-text">Most Spottings in a Day:</dt>
                             <dd class="col-sm-9"> @Model.MostSightingsInDay.DayOfSightings?.ToString("MMMM dd, yyyy") <br>
                                 Number
                                 of Sightings: @Model.MostSightingsInDay.NumberOfSightings</dd>
@@ -87,9 +78,9 @@
                     </dl>
                 </div>
             </div>
-            <div class="card mt-3">
+            <div class="card mt-3 storkdork-card">
                 <div class="card-header">
-                    <h4>StorkDork Milestones:</h4>
+                    <h4 class="descriptive-text">StorkDork Milestones:</h4>
                 </div>
                 <div class="card-body">
                     <dl class="row">
@@ -98,7 +89,7 @@
                             <dt class="col-sm-3">
                                 <figure>
                                     <img src="@Model.GoldUrl" alt="Gold Medal" class="img-fluid" style="max-width: 50px;">
-                                    <figcaption>Gold Sightings</figcaption>
+                                    <figcaption class="descriptive-text">Gold Sightings</figcaption>
                                 </figure>
                             </dt>
                         }
@@ -108,7 +99,7 @@
                                 <figure>
                                     <img src="@Model.SilverUrl" alt="Silver Medal" class="img-fluid"
                                         style="max-width: 50px;">
-                                    <figcaption>Silver Sightings</figcaption>
+                                    <figcaption class="descriptive-text">Silver Sightings</figcaption>
                                 </figure>
                             </dt>
                         }
@@ -118,7 +109,7 @@
                                 <figure>
                                     <img src="@Model.BronzeUrl" alt="Bronze Medal" class="img-fluid"
                                         style="max-width: 50px;">
-                                    <figcaption>Bronze Sightings</figcaption>
+                                    <figcaption class="descriptive-text">Bronze Sightings</figcaption>
                                 </figure>
                             </dt>
                         }
@@ -127,7 +118,7 @@
                             <dt class="col-sm-3">
                                 <figure>
                                     <img src="@Model.GoldUrl" alt="Gold Medal" class="img-fluid" style="max-width: 50px;">
-                                    <figcaption>Gold Photos</figcaption>
+                                    <figcaption class="descriptive-text">Gold Photos</figcaption>
                                 </figure>
                             </dt>
                         }
@@ -137,7 +128,7 @@
                                 <figure>
                                     <img src="@Model.SilverUrl" alt="Silver Medal" class="img-fluid"
                                         style="max-width: 50px;">
-                                    <figcaption>Silver Photos</figcaption>
+                                    <figcaption class="descriptive-text">Silver Photos</figcaption>
                                 </figure>
                             </dt>
                         }
@@ -147,7 +138,7 @@
                                 <figure>
                                     <img src="@Model.BronzeUrl" alt="Bronze Medal" class="img-fluid"
                                         style="max-width: 50px;">
-                                    <figcaption>Bronze Photos</figcaption>
+                                    <figcaption class="descriptive-text">Bronze Photos</figcaption>
                                 </figure>
                             </dt>
                         }

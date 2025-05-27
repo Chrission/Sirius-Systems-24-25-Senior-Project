@@ -27,14 +27,12 @@ namespace StorkDorkMain.Controllers
         public BirdingTipsController(StorkDorkDbContext context)
         {
             _context = context;
-          
         }
 
         [HttpGet]
 
         public async Task<IActionResult> Index()
         {
-   
             return View();
 
         }
@@ -42,7 +40,7 @@ namespace StorkDorkMain.Controllers
         // Start of the Novice Section
         [HttpGet]
         public IActionResult Table_of_Contents()
-        {    
+        {
             return View("Novice_Birding_Tips/Table_of_Contents");
 
         }
@@ -50,7 +48,7 @@ namespace StorkDorkMain.Controllers
         // Lesson #1
         [HttpGet]
         public IActionResult Introduction_To_Identification()
-        {    
+        {
             return View("Novice_Birding_Tips/Introduction_To_Identification");
 
         }
@@ -58,7 +56,7 @@ namespace StorkDorkMain.Controllers
         // Lesson #2
         [HttpGet]
         public IActionResult Introduction_To_Technology()
-        {    
+        {
             return View("Novice_Birding_Tips/Introduction_To_Technology");
 
         }
@@ -66,7 +64,7 @@ namespace StorkDorkMain.Controllers
         // Lesson #3
         [HttpGet]
         public IActionResult Introduction_To_Gear()
-        {    
+        {
             return View("Novice_Birding_Tips/Introduction_To_Gear");
 
         }
@@ -74,35 +72,65 @@ namespace StorkDorkMain.Controllers
         // Lesson #4
         [HttpGet]
         public IActionResult Introduction_To_Etiquette()
-        {    
+        {
             return View("Novice_Birding_Tips/Introduction_To_Etiquette");
 
         }
 
         [HttpGet]
         public IActionResult Introduction_To_Habitats()
-        {    
+        {
             return View("Novice_Birding_Tips/Introduction_To_Habitats");
 
         }
-        
+
 
 
 
         // Start of the Intermediate Section
         [HttpGet]
         public IActionResult Table_of_Contents_Intermediate()
-        {    
+        {
             return View("Intermediate_Birding_Tips/Table_of_Contents_Intermediate");
 
         }
 
         [HttpGet]
         public IActionResult Intermediate_Identification()
-        {    
+        {
             return View("Intermediate_Birding_Tips/Intermediate_Identification");
 
         }
+
+        [HttpGet]
+        public IActionResult Incorporating_Technology()
+        {
+            return View("Intermediate_Birding_Tips/Incorporating_Technology");
+
+        }
+
+        [HttpGet]
+        public IActionResult Getting_Geared_Up()
+        {
+            return View("Intermediate_Birding_Tips/Getting_Geared_Up");
+
+        }
+
+        [HttpGet]
+        public IActionResult Intermediate_Etiquette()
+        {
+            return View("Intermediate_Birding_Tips/Intermediate_Etiquette");
+
+        }
+        
+        [HttpGet]
+        public IActionResult Familiarizing_The_Habitat()
+        {    
+            return View("Intermediate_Birding_Tips/Familiarizing_The_Habitat");
+
+        }
+        
+        
         
 
 

@@ -126,6 +126,7 @@ document.addEventListener("DOMContentLoaded", function () {
             window.location.href = `/BirdLog/Index?selectedBirds=${selectedBirds.join(",")}`;
         });
     }
+    
 
     // Optimized location geocoding
     const locationDisplays = Array.from(document.querySelectorAll('.location-display'));
@@ -174,6 +175,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (nameSpan) {
                     nameSpan.textContent = truncateText(name);
                     nameSpan.style.display = 'block';
+                    // Store the full location name for searching
+                    element.setAttribute('data-full-location', name.toLowerCase());
                 }
             }
 
@@ -184,6 +187,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     nameSpan.textContent = truncateText(`${lat}, ${lng}`);
                     nameSpan.classList.add('text-muted');
                     nameSpan.style.display = 'block';
+                    element.setAttribute('data-full-location', `${lat}, ${lng}`);
                 }
             }
 
@@ -211,22 +215,54 @@ document.addEventListener("DOMContentLoaded", function () {
         // Show/hide clear button
         clearSearchBtn.style.display = hasSearch ? 'block' : 'none';
 
+        // Try to parse the search term as a date
+        let parsedDate = null;
+        if (hasSearch) {
+            const tryDate = new Date(searchTerm);
+            if (!isNaN(tryDate)) {
+                parsedDate = tryDate;
+            }
+        }
+
         // Get all table rows (skip header row)
         const rows = document.querySelectorAll('tbody tr');
         
         rows.forEach(row => {
             const birdCell = row.children[1].textContent.toLowerCase();
-            const locationCell = row.querySelector('.location-name')?.textContent.toLowerCase() || '';
-            
-            if (!hasSearch) {
-                row.style.display = '';
-                return;
+            // Use the full geocoded location for searching
+            const locationCell = row.querySelector('.location-display')?.getAttribute('data-full-location') || '';
+            const dateCell = row.children[0].textContent.toLowerCase();
+
+            let match = false;
+
+            // Match bird or location as before
+            if (birdCell.includes(searchTerm) || locationCell.includes(searchTerm)) {
+                match = true;
             }
 
-            const match = birdCell.includes(searchTerm) || 
-                         locationCell.includes(searchTerm);
-            
-            row.style.display = match ? '' : 'none';
+            // Match date column (supports "may 10 2025", "5/10/2025", "2025-05-10", etc.)
+            if (!match && hasSearch) {
+                // Try direct string match
+                if (dateCell.includes(searchTerm)) {
+                    match = true;
+                } else if (parsedDate) {
+                    // Try to match formatted date
+                    const dateVariants = [
+                        parsedDate.toLocaleDateString('en-US'), // e.g. 5/10/2025
+                        parsedDate.toLocaleDateString('en-GB'), // e.g. 10/05/2025
+                        parsedDate.toISOString().slice(0, 10),  // e.g. 2025-05-10
+                        parsedDate.toDateString().toLowerCase() // e.g. "sat may 10 2025"
+                    ];
+                    for (const variant of dateVariants) {
+                        if (dateCell.includes(variant.toLowerCase())) {
+                            match = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            row.style.display = match || !hasSearch ? '' : 'none';
         });
     }
 
@@ -244,11 +280,12 @@ document.addEventListener("DOMContentLoaded", function () {
     document.addEventListener('locationNameUpdated', performSearch);
 
     // Modified location geocoding code to dispatch events
-    function showResult(name) {
-        if (nameSpan) {
-            nameSpan.textContent = truncateText(name);
-            nameSpan.style.display = 'block';
-            nameSpan.dispatchEvent(new Event('locationNameUpdated'));
-        }
-    }
+    // (not used anymore, but left for reference)
+    // function showResult(name) {
+    //     if (nameSpan) {
+    //         nameSpan.textContent = truncateText(name);
+    //         nameSpan.style.display = 'block';
+    //         nameSpan.dispatchEvent(new Event('locationNameUpdated'));
+    //     }
+    // }
 });

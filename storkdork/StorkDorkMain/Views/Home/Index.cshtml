@@ -3,103 +3,240 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1 class="mt-4 container text-center mb-5">Welcome to Stork Dork</h1>
+<h1 class="mt-4 container text-center mb-5" style="color: #381D2A;">Welcome to Stork Dork</h1>
 
-<h3 class="mt-4 container text-center mb-5 fs-5">
+<h3 class="mt-4 container text-center mb-5 fs-5 howdy-heading" style="color: #381D2A;">
     Discover birds. Explore Hotspots. Connect with your fellow Chickadees.
 </h3>
 
-<!-- Search For Birds -->
-<div class="home-search-bar container my-4 d-flex justify-content-center">
-    <form id="homepageSearchForm" onsubmit="return redirectToSearchPage(event)" class="d-flex w-100" style="max-width: 600px;">
-        <div class="input-group w-100">
-            <input type="text" id="homepageSearchInput" class="form-control" placeholder="Enter bird name..." />
-            <button class="btn btn-primary" type="submit">Search</button>
+<!-- Full Image Banner -->
+<section class="container mb-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="full-image-banner">
+                <div class="banner-content">
+                    <h2 class="banner-title">New to Birding?</h2>
+                    <p class="howdy-heading">Welcome to the wonderful world of birdwatching! 
+                        Get started with our beginner-friendly tips, guides, and
+                        resources designed to help you explore a world filled with feathers and skies!</p>
+                    <a href="BirdingTips" class="cta-button">Explore Now <i class="bi bi-arrow-right"></i></a>
+                </div>
+            </div>
         </div>
-    </form>
-</div>
+    </div>
+</section>
 
-<hr class="container my-4" />
+<hr class="container my-4" style="border-color: #AABD8C;" />
 
-<!-- Feature Sections -->
+<!-- Feature Sections - Full Image Cards -->
 <section class="container mb-5">
     <div class="row g-4">
+        <!-- Search Birds Card -->
         <div class="col-md-4">
-            <a href="Search/Index" class="text-decoration-none text-dark">
-                <div class="card h-100">
-                    <div class="placeholder-img">Explore Birds</div>
-                    <div class="card-body">
-                        <p class="card-text">Search for birds by name or family to learn more about them</p>
-                    </div>
+            <a href="Search/Index" class="full-image-card" style="background-image: url('/images/cards/search-birds-image.svg');">
+                <div class="card-overlay">
+                    <h5 class="card-title">Search Birds</h5>
+                    <p class="howdy-paragraph">Search for birds by name or family</p>
+                    <span class="card-button">Find Birds</span>
                 </div>
             </a>
         </div>
+
+        <!-- Explore Map Card -->
         <div class="col-md-4">
-            <a href="Leaflet/Map" class="text-decoration-none text-dark">
-                <div class="card h-100">
-                    <div class="placeholder-img">Hotspots</div>
-                    <div class="card-body">
-                        <p class="card-text">Find popular birdwatching locations and explore migration patterns</p>
-                    </div>
+            <a href="Leaflet/Map" class="full-image-card" style="background-image: url('/images/cards/maps-image.svg');">
+                <div class="card-overlay">
+                    <h5 class="card-title">Explore the Map</h5>
+                    <p class="howdy-paragraph">See what birds other birdwatchers have found!</p>
+                    <span class="card-button">View Map</span>
                 </div>
             </a>
         </div>
+
+        <!-- Community Card -->
         <div class="col-md-4">
-            <!-- Placeholder for under-construction feature -->
-            <div class="card h-100">
-                <div class="placeholder-img">Community</div>
-                <div class="card-body">
-                    <p class="card-text">Join a vibrant community of bird enthusiasts and share your findings</p>
+            <a class="full-image-card" style="background-image: url('/images/cards/community-image.svg');">
+                <div class="card-overlay">
+                    <h5 class="card-title">Community</h5>
+                    <p class="howdy-paragraph">Page Under Construction</p>
+                    <span class="card-button">View Details</span>
                 </div>
-            </div>
+            </a>
         </div>
     </div>
 </section>
-
-<hr class="container my-4" />
-
-<section class="container mb-5">
-    <div class="card bg-light" style="height: 200px;">
-        <div class="card-body d-flex align-items-center" style="padding-left: 2rem;">
-            <div>
-
-                <h3 class="card-title mb-3">New to birding?</h3>
-                <a href="BirdingTips/Index" 
-                <p class="card-text">
-                    Welcome to the wonderful world of birdwatching!<br />
-                    Get started with our beginner-friendly tips, guides, and resources<br />
-                    designed to help you identify birds and enjoy your birding journey.
-                </p>
-            </div>
-        </div>
-    </div>
-</section>
-
-@section Scripts {
-    <script>
-        function redirectToSearchPage(event) {
-            event.preventDefault();
-            const searchTerm = document.getElementById("homepageSearchInput").value.trim();
-            if (searchTerm) {
-                const encodedTerm = encodeURIComponent(searchTerm);
-                window.location.href = `/search/birds?searchTerm=${encodedTerm}&searchType=name`;
-            } else {
-                alert("Please enter a bird name.");
-            }
-            return false;
-        }
-    </script>
-}
 
 <style>
-    .placeholder-img {
-        width: 100%;
-        height: 200px;
-        background-color: #e0e0e0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-        color: #888;
+
+    @@font-face {
+    font-family: 'Howdy Bird';
+    src: url('/fonts/Howdy Bird.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@@font-face  {
+  font-family: "Darumadrop One", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+
+.banner-title{
+  font-family: 'Darumadrop One', sans-serif; 
+  color: #381D2A;
+}
+
+/*
+   COLOR SCHEME 
+*/
+:root {
+    --dark-brown: #381D2A;
+    --blue: #3E6990;
+    --green: #AABD8C;
+    --cream: #E9E3B4;
+    --orange: #F39B6D;
+}
+
+/* 
+   FULL IMAGE BANNER 
+*/
+.full-image-banner {
+    background-image: url('/images/cards/birding-tips-banner.svg');
+    background-size: cover;
+    background-position: center;
+    min-height: 400px;
+    border-radius: 1rem;
+    border: 2px solid var(--cream);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.banner-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: linear-gradient(90deg, rgba(233, 227, 180, 0.9) 0%, rgba(233, 227, 180, 0) 100%);
+}
+
+/* 
+   FULL IMAGE CARDS
+*/
+.full-image-card {
+    display: block;
+    height: 350px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 0.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.full-image-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+.card-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1.5rem;
+    background: linear-gradient(to top, rgba(56, 29, 42, 0.9) 0%, transparent 100%);
+    color: white;
+}
+
+.card-title {
+    font-family: 'Darumadrop One', sans-serif;
+    font-weight: 600;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: var(--cream);
+}
+
+.card-desc {
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    color: rgba(255,255,255,0.8);
+}
+
+.card-button {
+    display: inline-block;
+    background: var(--green);
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: 0.25rem;
+    font-weight: 500;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+.full-image-card:hover .card-button {
+    background: var(--orange);
+}
+
+/* 
+   CTA BUTTON 
+   */
+.cta-button {
+    display: inline-block;
+    background: var(--green);
+    color: white;
+    padding: 0.6rem 1.5rem;
+    border-radius: 50px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1);
+    width: fit-content;
+}
+
+.cta-button:hover {
+    background: var(--blue);
+}
+
+
+@@media (max-width: 768px) {
+    .full-image-banner {
+        min-height: 300px;
     }
+    
+    .banner-content {
+        width: 100%;
+        background: rgba(233, 227, 180, 0.9);
+        position: relative;
+        padding: 1.5rem;
+    }
+    
+    .full-image-card {
+        height: 200px;
+    }
+    
+    .card-overlay {
+        padding: 1rem;
+    }
+    
+    .card-title {
+        font-size: 1.1rem;
+    }
+}
+
+@@media (max-width: 576px) {
+    .full-image-card {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    
+}
 </style>
+

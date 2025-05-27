@@ -14,18 +14,21 @@
 
     <div class="form-group mb-3">
         <label asp-for="Caption" class="form-label">Caption (optional)</label>
-        <input asp-for="Caption" class="form-control" />
+        <input asp-for="Caption" class="form-control input-style" />
         <span asp-validation-for="Caption" class="text-danger"></span>
     </div>
 
     <div class="form-group mb-3">
         <label class="form-label">Upload Photo</label>
-        <input type="file" asp-for="Photo" class="form-control" accept="image/*" />
+        <input type="file" asp-for="Photo" class="form-control input-style" accept="image/*" />
         <span asp-validation-for="Photo" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary">Submit Photo</button>
-    <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#photoSubmissionForm">Cancel</button>
+    <button type="submit" class="btn storkdork-button">
+        <i class="bi bi-cloud-upload me-2"></i> Submit Photo
+    </button>
+    <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" 
+            data-bs-target="#photoSubmissionForm">Cancel</button>
 </form>
 
 @section Scripts 

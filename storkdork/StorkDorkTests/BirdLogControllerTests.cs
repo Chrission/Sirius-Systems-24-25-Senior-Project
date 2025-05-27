@@ -18,6 +18,7 @@ using StorkDorkMain.DAL.Abstract;
 using StorkDorkMain.Models;
 using StorkDorkTests.Helpers;
 using Newtonsoft.Json;
+using StorkDorkMain.Services; // Add this line if INotificationService is in this namespace
 
 namespace StorkDorkTests
 {
@@ -29,6 +30,7 @@ namespace StorkDorkTests
         private Mock<UserManager<IdentityUser>> _mockUserManager;
         private Mock<ISDUserRepository> _mockSdUserRepository;
         private Mock<IMilestoneRepository> _mockMilestoneRepo;
+        private Mock<INotificationService> _mockNotificationService;
 
         // ===================================================================
         // Setup & Teardown
@@ -38,16 +40,19 @@ namespace StorkDorkTests
         {
             // Initialize mock dependencies
             _mockContext = new Mock<StorkDorkDbContext>();
-            _mockUserManager = UserManagerHelper.GetMockUserManager(); // Helper-based initialization
             _mockSdUserRepository = new Mock<ISDUserRepository>();
+            _mockMilestoneRepo = new Mock<IMilestoneRepository>();
+            _mockNotificationService = new Mock<INotificationService>();
 
             // Initialize controller with all required dependencies
             _controller = new BirdLogController(
                 _mockContext.Object,
                 _mockUserManager.Object,
                 _mockSdUserRepository.Object,
-                _mockMilestoneRepo.Object
+                _mockMilestoneRepo.Object,
+                _mockNotificationService.Object
             );
+
         }
 
         [TearDown]

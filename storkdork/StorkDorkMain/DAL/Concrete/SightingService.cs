@@ -41,7 +41,8 @@ public class SightingService : ISightingService
                 Date = s.Date,
                 Country = s.Country,
                 Subdivision = s. Subdivision,
-                Birder = s.SdUser.UserSettings.AnonymousSightings ? "Anonymous" : $"{s.SdUser.FirstName}, {s.SdUser.LastName}"
+                Birder = s.SdUser.UserSettings.AnonymousSightings ? "Anonymous" : $"{s.SdUser.FirstName}, {s.SdUser.LastName}",
+                BirdId = s.Bird.Id,
             })
             .ToListAsync();
     }
@@ -64,7 +65,8 @@ public class SightingService : ISightingService
                 Date = s.Date,
                 Country = s.Country,
                 Subdivision = s.Subdivision,
-                Birder = s.SdUser.UserSettings.AnonymousSightings ? "Anonymous" : $"{s.SdUser.FirstName}, {s.SdUser.LastName}"
+                Birder = s.SdUser.UserSettings.AnonymousSightings ? "Anonymous" : $"{s.SdUser.FirstName}, {s.SdUser.LastName}",
+                BirdId = s.Bird.Id,
             })
             .ToListAsync();
     }

@@ -2,117 +2,89 @@
 
 @{
     ViewData["Title"] = "Checklist Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="container mt-4">
-    <h2 class="mb-4">Checklist Details</h2>
+    <h1 class="mt-4 container text-center mb-5" style="color: #381D2A; font-family: 'Darumadrop One', sans-serif;">Checklist Details</h1>
 
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <h4 class="card-title">@Model.ChecklistName</h4>
-            <hr />
+    <div class="card shadow-sm" style="border: 2px solid #AABD8C; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+        <div class="card-header" style="background-color: #381D2A; color: #E9E3B4;">
+            <h4 style="margin: 0; font-family: 'Darumadrop One', sans-serif;">@Model.ChecklistName</h4>
+        </div>
+        <div class="card-body" style="background-color: #E9E3B4;">
             <dl class="row">
-                <dt class="col-sm-3">Checklist Name</dt>
-                <dd class="col-sm-9">@Model.ChecklistName</dd>
+                <dt class="col-sm-3" style="color: #381D2A; font-weight: 600;">Checklist Name</dt>
+                <dd class="col-sm-9" style="color: #3E6990;">@Model.ChecklistName</dd>
 
-                <dt class="col-sm-3">Created By</dt>
-                <dd class="col-sm-9">@Model.SdUser.FirstName</dd>
+                <dt class="col-sm-3" style="color: #381D2A; font-weight: 600;">Created By</dt>
+                <dd class="col-sm-9" style="color: #3E6990;">@Model.SdUser.FirstName</dd>
             </dl>
         </div>
     </div>
 
-    <div class="mt-4">
-        <h4>Checklist Items</h4>
-        <div class="table-responsive">
-            <table class="table table-hover table-bordered">
-                <thead class="thead-light">
-                    <tr>
-                        <th>Common Name</th>
-                        <th>Scientific Name</th>
-                        <th>Sighted</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.ChecklistItems)
-                    {
+    <div class="mt-4 card" style="border: 2px solid #AABD8C; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+        <div class="card-header" style="background-color: #381D2A; color: #E9E3B4;">
+            <h4 style="margin: 0; font-family: 'Darumadrop One', sans-serif;">Birds In My Checklist</h4>
+        </div>
+        <div class="card-body" style="background-color: #E9E3B4;">
+            <div class="table-responsive">
+                <table class="table table-hover table-borderless">
+                    <thead style="background-color: #AABD8C; color: #381D2A;">
                         <tr>
-                            <td>@item.Bird.CommonName</td>
-                            <td>@item.Bird.ScientificName</td>
-                            <td>
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input sighted-checkbox" data-id="@item.Id" @(item.Sighted == true ? "checked" : "") />
-                                </div>
-                            </td>
+                            <th>Common Name</th>
+                            <th>Scientific Name</th>
+                            <th>Sighted</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.ChecklistItems)
+                        {
+                            <tr style="background-color: rgba(170, 189, 140, 0.2);">
+                                <td style="color: #381D2A;">@item.Bird.CommonName</td>
+                                <td style="color: #3E6990;"><em>@item.Bird.ScientificName</em></td>
+                                <td>
+                                    <div class="form-check">
+                                        <input type="checkbox" 
+                                               class="form-check-input" 
+                                               style="accent-color: #F39B6D;"
+                                               disabled="disabled"
+                                               @(item.Sighted == true ? "checked" : "") />
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    <div class="mt-4">
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit Checklist</a>
-        <a asp-action="Index" asp-route-userId="@Model.SdUserId" class="btn btn-secondary">Back to List</a>
+    <div class="mt-4 d-flex gap-3">
+        <a asp-action="Index" asp-route-userId="@Model.SdUserId" 
+           class="btn btn-secondary flex-grow-1"
+           style="background-color: #381D2A; color: #E9E3B4; border: none;">
+            Back to List
+        </a>
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        $(document).ready(function () {
-            $('.sighted-checkbox').change(function () {
-                var checklistItemId = $(this).data('id');
-                var isSighted = $(this).is(':checked');
-
-                $.ajax({
-                    url: '@Url.Action("ToggleSighted", "Checklists")',
-                    type: 'POST',
-                    data: {
-                        id: checklistItemId,
-                        sighted: isSighted
-                    },
-                    success: function (response) {
-                        if (response.success) {
-                            console.log('Sighted status updated successfully.');
-                        } else {
-                            console.error('Failed to update sighted status.');
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('Error:', error);
-                    }
-                });
-            });
-        });
-    </script>
-}
-
 <style>
     .card {
-        border: none;
-        border-radius: 10px;
+        border-radius: 8px;
+        overflow: hidden;
     }
-
+    
     .table-hover tbody tr:hover {
-        background-color: #f8f9fa;
+        background-color: rgba(170, 189, 140, 0.3) !important;
     }
-
-    .form-check-input {
-        cursor: pointer;
+    
+    .cta-button:hover {
+        background-color: #e88b5a !important;
     }
-
-    .btn-primary {
-        background-color: #007bff;
-        border-color: #007bff;
-    }
-
-    .btn-secondary {
-        background-color: #6c757d;
-        border-color: #6c757d;
-    }
-
-    .btn {
-        margin-right: 10px;
+    
+    .table-borderless td,
+    .table-borderless th {
+        border: none;
     }
 </style>
-
-<!-- Notes -->

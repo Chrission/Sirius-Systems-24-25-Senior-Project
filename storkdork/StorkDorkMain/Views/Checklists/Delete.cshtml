@@ -1,33 +1,83 @@
 @model StorkDorkMain.Models.Checklist
 
-<h2>Delete Checklist</h2>
-<p>Are you sure you want to delete this checklist?</p>
+@{
+    ViewData["Title"] = "Delete Checklist";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
 
-<div>
-    <h3>@Model.ChecklistName</h3>
-    <p><strong>User:</strong> @Model.SdUser.FirstName</p>
+<div class="container mt-4">
+    <h1 class="mt-4 container text-center mb-5" style="color: #381D2A; font-family: 'Darumadrop One', sans-serif;">Delete Checklist</h1>
 
-    <h4>Birds in this checklist:</h4>
-    @if (Model.ChecklistItems.Any())
-    {
-        <ul>
-            @foreach (var item in Model.ChecklistItems)
+    <div class="card shadow-sm" style="border: 2px solid #AABD8C; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+        <div class="card-header" style="background-color: #381D2A; color: #E9E3B4;">
+            <h3 style="margin: 0; font-family: 'Darumadrop One', sans-serif;">@Model.ChecklistName</h3>
+        </div>
+        <div class="card-body" style="background-color: #E9E3B4;">
+            <div class="alert alert-warning" style="background-color: #F39B6D; border-color: #e88b5a; color: #381D2A;">
+                <strong>Warning:</strong> Are you sure you want to permanently delete this checklist?
+            </div>
+
+            <dl class="row mb-4">
+                <dt class="col-sm-3" style="color: #381D2A; font-weight: 600;">Created By</dt>
+                <dd class="col-sm-9" style="color: #3E6990;">@Model.SdUser.FirstName</dd>
+            </dl>
+
+            <h4 style="color: #381D2A; font-family: 'Darumadrop One', sans-serif;">Birds in this checklist:</h4>
+            @if (Model.ChecklistItems.Any())
             {
-                <li>@item.Bird.CommonName (@item.Bird.ScientificName)</li>
+                <ul class="list-group">
+                    @foreach (var item in Model.ChecklistItems)
+                    {
+                        <li class="list-group-item" 
+                            style="background-color: rgba(170, 189, 140, 0.2); 
+                                   border-color: #AABD8C;
+                                   color: #381D2A;">
+                            @item.Bird.CommonName <em style="color: #3E6990;">(@item.Bird.ScientificName)</em>
+                        </li>
+                    }
+                </ul>
             }
-        </ul>
-    }
-    else
-    {
-        <p>No birds in this checklist.</p>
-    }
+            else
+            {
+                <div class="alert alert-info" style="background-color: #AABD8C; border-color: #95a97c; color: #381D2A;">
+                    No birds found in this checklist
+                </div>
+            }
+        </div>
+    </div>
+
+    <form asp-action="Delete" method="post" class="mt-4">
+        <input type="hidden" name="id" value="@Model.Id" />
+        <div class="d-flex gap-3">
+            <button type="submit" class="btn btn-danger flex-grow-1" 
+                    style="font-family: 'Darumadrop One', sans-serif; 
+                           background-color: #F39B6D; 
+                           border-color: #F39B6D;
+                           color: #381D2A;">
+                Delete Permanently
+            </button>
+            <a asp-action="Index" asp-route-userId="@Model.SdUserId" 
+               class="btn btn-secondary flex-grow-1"
+               style="background-color: #381D2A; 
+                      color: #E9E3B4; 
+                      border: none;">
+                Cancel
+            </a>
+        </div>
+    </form>
 </div>
 
-<form asp-action="Delete" method="post">
-    <input type="hidden" name="id" value="@Model.Id" />
-    <button type="submit" class="btn btn-danger">Delete</button>
-    <a asp-action="Index" asp-route-userId="@Model.SdUserId" class="btn btn-secondary">Cancel</a>
-</form>
-
-
-<!-- Notes -->
+<style>
+    .card {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .list-group-item {
+        margin-bottom: 5px;
+    }
+    
+    .alert {
+        border-radius: 8px;
+    }
+</style>

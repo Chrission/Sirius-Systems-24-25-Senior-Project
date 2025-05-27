@@ -15,4 +15,5 @@ public class SightMarker
     public string? Country {get;set;}
     public string? Subdivision {get;set;}
     public string? Birder {get;set;}
+    public int? BirdId {get;set;}
 }

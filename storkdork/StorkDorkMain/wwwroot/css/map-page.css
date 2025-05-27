@@ -5,16 +5,29 @@ html, body {
 }
 
 .map-page {
-    height: 100vh;
+    height: 100%;
     margin: 0;
     padding: 0;
 }
 
 .map-page #map {
-    height: 98%;
+    height: 100%;
     width: 100%;
 }
 
-.leaflet-popup-content-wrapper, .leaflet-popup-tip  {
-    background-color: #E9E3B4 !important;
+.leaflet-popup-content-wrapper {
+  background-color: #fff8f0 !important;
+  height: auto;
+  width: auto;
+  border-radius: 25px;  
+  border-color: #381D2A;
+  border-width: 5px;
+  border-style: solid;
+  overflow: hidden;
+  margin-top: 25px;
+  box-shadow: -10px 10px 10px -3px #41333A;
+}
+
+.leaflet-popup-tip {
+  background-color: #41333A !important;
 }

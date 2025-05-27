@@ -1,0 +1,26 @@
+.pagination-storkdork .page-link {
+    color: #381D2A;
+    border-color: #AABD8C;
+    background-color: #F2F8DB;
+}
+    
+.pagination-storkdork .page-item.active .page-link {
+    background-color: #AABD8C;
+    border-color: #381D2A;
+    color: #381D2A;
+}
+
+.pagination-storkdork .page-item.disabled .page-link {
+    color: #6c757d;
+    background-color: #F2F8DB;
+}
+
+.pagination-storkdork .page-link:hover {
+    background-color: #AABD8C;
+    color: #381D2A;
+    border-color: #381D2A;
+}
+
+.pagination-storkdork .page-link:focus {
+    box-shadow: 0 0 0 0.25rem rgba(170, 189, 140, 0.5);
+}

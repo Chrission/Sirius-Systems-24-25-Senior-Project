@@ -29,15 +29,18 @@
                 </div>
                 <div class="labels">
                     <div>Common: <span id="commonNameDisplay">-</span></div>
-                    <div>Latin: <span id="latinNameDisplay">-</span></div>
+                    <div>Latin: <span id="scientificNameDisplay">-</span></div>
                 </div>
             </div>
 
             <!-- Right Panel -->
             <div class="right-panel">
-                <form asp-action="Create" method="post" id="sightingForm" enctype="multipart/form-data">
+                <form asp-action="Edit" method="post" id="sightingForm" enctype="multipart/form-data">
                     @Html.AntiForgeryToken()
                     <input type="hidden" asp-for="BirdId" id="BirdId" />
+                    <input type="hidden" id="initialBirdId" value="@Model.BirdId" />
+                    <input type="hidden" id="initialBirdName" value="@prefillName" />
+                    <input type="hidden" id="initialScientificName" value="@Model.Bird?.ScientificName" />
                     <input type="hidden" asp-for="Latitude" id="LatitudeInput" />
                     <input type="hidden" asp-for="Longitude" id="LongitudeInput" />
 
@@ -89,14 +92,8 @@
                         </div>
                     </div>
 
-                    <!-- Weather -->
-                    <div class="field-row">
-                        <label>Weather</label>
-                        <input type="text" class="form-control" 
-                               placeholder="Sunny, 72°F, Calm winds" />
-                    </div>
-
                     <!-- Notes -->
+                    <label>Notes</label>
                     <textarea asp-for="Notes" 
                         class="form-control notes-textarea h-100" 
                         placeholder="Detailed observations..."
@@ -115,7 +112,7 @@
     </div>
 </div>
 <div>
-    <a asp-action="Index" class="btn btn-primary" asp-route-userId="@ViewBag.SelectedUserId">Back to List</a>
+    <a asp-action="Index" class="btn btn-primary" ></a>Back to List</a>
 </div>
 
 <style>
@@ -141,64 +138,7 @@
 </style>
 
 @section Scripts {
-    <script src="~/js/birdlog/birdlog.js"></script>
-    <script>
-        document.getElementById('removePhoto').addEventListener('click', function () {
-            // Clear preview
-            const preview = document.getElementById('photoPreview');
-            if (preview) {
-                preview.src = "";
-                preview.style.display = "none";
-            }
+    <script src="~/js/birdlog/edit.js"></script>
+    <script src="~/js/birdlog/create.js"></script>
 
-            // Clear file input
-            const fileInput = document.getElementById('photoFile');
-            if (fileInput) {
-                fileInput.value = "";
-            }
-
-            // Tell backend to remove photo
-            document.getElementById('removePhoto').value = "true";
-        });
-
-        function previewNewPhoto() {
-            const fileInput = document.getElementById('photoFile');
-            const preview = document.getElementById('photoPreview');
-
-            const file = fileInput.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            } else {
-                preview.src = '';
-                preview.style.display = 'none';
-            }
-        }
-
-        document.getElementById('removePhoto')?.addEventListener('click', function () {
-            // Clear preview
-            const preview = document.getElementById('photoPreview');
-            if (preview) {
-                preview.src = "";
-                preview.style.display = "none";
-            }
-
-            // Clear file input
-            const fileInput = document.getElementById('photoFile');
-            if (fileInput) {
-                fileInput.value = "";
-            }
-
-            // Set hidden input to indicate removal
-            const flagInput = document.getElementById('removePhotoFlag');
-            if (flagInput) {
-                flagInput.value = "true";
-            }
-        });
-
-    </script>
 }

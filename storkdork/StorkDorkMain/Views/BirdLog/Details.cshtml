@@ -2,78 +2,178 @@
 @{
     ViewData["Title"] = "Details";
 }
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Darumadrop+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+}
+<style>
+    @@keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
 
-<div class="card mx-auto shadow-lg p-4" style="max-width: 900px; border-radius: 20px;">
-    <div class="row g-0">
-        <!-- Bird Image -->
-        <div class="col-md-5 d-flex align-items-center justify-content-center">
-            @if (Model.PhotoData != null && Model.PhotoContentType != null)
-            {
-                <img src="data:@Model.PhotoContentType;base64,@Convert.ToBase64String(Model.PhotoData)" 
-                    class="img-fluid rounded" alt="Bird Photo" 
-                    style="width: 100%; height: auto; object-fit: cover; border-radius: 15px;">
-            }
-            else
-            {
-                <img src="/images/placeholder-bird.svg" class="img-fluid rounded" 
-                    alt="Bird Image" style="width: 100%; height: auto; object-fit: cover; border-radius: 15px;">
-            }
-        </div>
-        
-        <!-- Card Details -->
-        <div class="col-md-7">
-            <div class="card-body">
-                <!-- Bird Name -->
-                <h3 class="card-title text-primary fw-bold text-center">
-                    @(Model.Bird?.CommonName ?? "Unknown Bird")
+    .animated-gradient {
+        background: linear-gradient(-45deg, #E9E3B4, #fad0c4, #fbb792, #F39B6D);
+        background-size: 400% 400%;
+        animation: gradientShift 15s ease infinite;
 
-                </h3>
-                <!-- Observer -->
-                <p class="card-text fs-5">
-                    <strong>Observer:</strong>
-                    @(Model.SdUser?.FirstName ?? "Unknown Observer")
+    }
 
+    .h2, .h4, .user-notes, .text-center {
+        font-family: 'Darumadrop One', sans-serif;
+        color: #381D2A;
+    }
+    .text-pink
+    {
+        color: #396990
+    }
+
+    .label {
+        font-weight: bold;
+    }
+
+    .btn i {
+        margin-right: 6px;
+    }
+</style>
+
+<div class="container py-5">
+    <!-- Card -->
+    <div class="card shadow-lg mx-auto p-4" style="max-width: 700px; border-radius: 20px; position: relative; overflow: hidden;">
+        <!-- Gradient Background -->
+        <div class="animated-gradient" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 20px; z-index: 0;"></div>
+
+        <!-- Content -->
+        <div style="position: relative; z-index: 1;">
+            <!-- Image -->
+            <div class="text-center mb-4">
+                @if (Model.PhotoData != null && Model.PhotoContentType != null)
+                {
+                    <img src="data:@Model.PhotoContentType;base64,@Convert.ToBase64String(Model.PhotoData)" class="img-fluid rounded" alt="Bird Photo" style="max-height: 300px; object-fit: cover; border-radius: 15px;">
+                }
+                else
+                {
+                    <img src="/images/placeholder-bird.svg" class="img-fluid rounded" alt="Bird Image" style="max-height: 300px; object-fit: cover; border-radius: 15px;">
+                }
+            </div>
+
+            <!-- Names -->
+            <h2 class="text-center fw-bold">Name: @(Model.Bird?.CommonName ?? "Unknown Bird")</h2>
+            <h2 class="text-center fw-bold">Scientific Name: @(Model.Bird?.ScientificName ?? "Unknown Bird")</h2>
+
+            <!-- Family Info Side by Side -->
+            <div class="d-flex justify-content-center gap-4 mt-3 mb-4">
+                <div>
+                    <h5 class="text-center fw-bold text-pink mb-0">Family (Scientific)</h5>
+                    <p class="text-center">@(Model.Bird?.FamilyScientificName ?? "Unknown")</p>
+                </div>
+                <div>
+                    <h5 class="text-center fw-bold text-pink mb-0">Family (Common)</h5>
+                    <p class="text-center">@(Model.Bird?.FamilyCommonName ?? "Unknown")</p>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="mb-4">
+                <h4 class="text-center fw-bold">Notes</h4>
+                <p class="fs-5 text-center user-notes">
+                    @if (!string.IsNullOrEmpty(Model.Notes))
+                    {
+                        var notesParts = Model.Notes.Split(new[] { "|||" }, StringSplitOptions.RemoveEmptyEntries);
+                        var userNotes = notesParts.Length > 0 ? notesParts[0].Trim() : "";
+                        @userNotes
+                    }
+                    else
+                    {
+                        <span class="text-muted">No Notes Recorded.</span>
+                    }
                 </p>
+            </div>
 
-                <!-- Location -->
-                <p class="card-text fs-5">
+            <!-- Location -->
+            <div class="mb-3">
+                <h4 class="text-center fw-bold">Spotted</h4>
+                @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+                {
+                    <div class="location-display p-3 rounded bg-light border text-center" 
+                         data-lat="@Model.Latitude.Value.ToString("0.0000")" 
+                         data-lng="@Model.Longitude.Value.ToString("0.0000")">
+                        <div class="loading-spinner small mb-2"></div>
+                        <div class="location-name text-muted small"></div>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted text-center">No location data recorded.</p>
+                }
+            </div>
 
-                </p>
+            <!-- Date -->
+            <p class="fs-5 text-center">
+                <strong>Date:</strong>
+                @(Model.Date?.ToString("MMMM dd, yyyy") ?? "No Date Recorded")
+            </p>
 
-                <!-- Date -->
-                <p class="card-text fs-5">
-                    <strong>Date:</strong> 
-                    @(Model.Date?.ToString("MMMM dd, yyyy") ?? "No Date Recorded")
-                </p>
+            <!-- Timestamp -->
+            <p class="text-muted small text-center mb-3">
+                Last updated @DateTime.Now.ToString("MMM dd, yyyy hh:mm tt")
+            </p>
+
+            <!-- Edit Button -->
+            <div class="text-center mt-4">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn text-pink btn-lg">
+                    <i class="fas fa-pencil-alt"></i> Edit
+                </a>
             </div>
         </div>
     </div>
 
-    <!-- Notes Section (Below Image) -->
-    <div class="card-footer bg-white">
-        <h4 class="fw-bold">Notes</h4>
-        <p class="card-text fs-5">
-            @if (!string.IsNullOrEmpty(Model.Notes))
-            {
-                var notesParts = Model.Notes.Split(new[] { "|||" }, StringSplitOptions.RemoveEmptyEntries);
-                var userNotes = notesParts.Length > 0 ? notesParts[0].Trim() : "";
-                @userNotes
-            }
-            else
-            {
-                <span class="text-muted">No Notes Recorded.</span>
-            }
-        </p>
-
-        <!-- Timestamp -->
-        <p class="text-muted">
-            <small>Last updated @DateTime.Now.ToString("MMM dd, yyyy HH:mm tt")</small>
-        </p>
-
-        <!-- Buttons -->
-        <div class="d-flex justify-content-between">
-            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-lg w-50 me-2">Edit</a>
-            <a asp-action="Index" class="btn btn-secondary btn-lg w-50">Back to List</a>
-        </div>
+    <!-- Back to List Button Outside Card -->
+    <div class="text-center mt-3">
+        <a asp-action="Index" class="btn btn-secondary btn-lg">Back to List</a>
     </div>
 </div>
+
+@section Scripts {
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll('.location-display').forEach(container => {
+            const lat = container.dataset.lat;
+            const lng = container.dataset.lng;
+            const nameDiv = container.querySelector('.location-name');
+            const spinner = container.querySelector('.loading-spinner');
+
+            if (lat && lng) {
+                spinner.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading location...';
+
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`, {
+                    headers: { 'User-Agent': 'StorkDork/1.0 (contact@yourdomain.com)' }
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error("Request failed");
+                    return response.json();
+                })
+                .then(data => {
+                    spinner.innerHTML = '';
+                    const address = data.address || {};
+                    const locationParts = [
+                        address.road,
+                        address.neighbourhood,
+                        address.city,
+                        address.state,
+                        address.country
+                    ].filter(Boolean).join(', ');
+                    nameDiv.textContent = locationParts || "Location not found";
+                })
+                .catch(error => {
+                    console.error("Geocoding failed:", error);
+                    spinner.innerHTML = '';
+                    nameDiv.textContent = "Could not load location";
+                    nameDiv.classList.add('text-danger');
+                });
+            }
+        });
+    });
+</script>
+}

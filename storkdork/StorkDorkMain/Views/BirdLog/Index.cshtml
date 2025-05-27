@@ -5,73 +5,28 @@
 }
 
 <div class="container mt-4">
-    <h1 class="mb-4">Bird Sightings</h1>
+    <h1 class="birdlog-heading">Bird Sightings</h1>
 
-<div class="d-flex justify-content-end mb-3">
-    <div class="btn-group">
-        <button id="gridViewBtn" class="btn btn-outline-secondary">
-            <i class="bi bi-grid-3x3-gap"></i> Grid
-        </button>
-        <button id="listViewBtn" class="btn btn-outline-secondary">
-            <i class="bi bi-list-ul"></i> List
-        </button>
+    <div class="container text-center mb-4">
+        <a asp-action="Create" class="btn cta-button" style="font-family: 'Darumadrop One', sans-serif;">Add New Sighting</a>
     </div>
-</div>
-<!--- add the first 3 recent sightings on top --->
 
-<!-- Recent Sightings Sidebar -->
-@*
-<div class="col-lg-4">
-    <div class="card recent-sightings-panel shadow-sm mb-4">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">
-                <i class="bi bi-clock-history me-2"></i>
-                Recent Sightings
-            </h5>
-        </div>
-        <div class="card-body">
-            @if (Model != null && Model.Any())
-            {
-                <div class="recent-sightings-grid">
-                    @foreach (var sighting in Model.OrderByDescending(s => s.Date).Take(3))
-                    {
-                        <div class="sighting-bubble">
-                            <div class="bubble-content">
-                                @if (sighting.PhotoData != null)
-                                {
-                                    <img src="data:@sighting.PhotoContentType;base64,@Convert.ToBase64String(sighting.PhotoData)" 
-                                         alt="@sighting.Bird?.CommonName" 
-                                         class="sighting-thumbnail">
-                                }
-                                else
-                                {
-                                    <div class="no-image">
-                                        <i class="bi bi-binoculars"></i>
-                                    </div>
-                                }
-                                <div class="sighting-info">
-                                    <div class="common-name">
-                                        @sighting.Bird?.CommonName
-                                    </div>
-                                    <div class="sighting-date">
-                                        @sighting.Date?.ToString("MMM dd")
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                </div>
-            }
-            else
-            {
-                <div class="text-center text-muted py-3">
-                    No recent sightings
-                </div>
-            }
+    <div class="mb-4">
+        <div class="input-group rounded-pill shadow-sm">
+            <input type="text" id="globalSearch" 
+                class="form-control rounded-pill" 
+                placeholder="Search birds or locations..."
+                aria-label="Search">
+            <button id="clearSearch" class="btn btn-link text-muted" 
+                    style="margin-left: -40px; z-index: 100; display: none;">
+                <i class="bi bi-x-circle"></i>
+            </button>
+            <span class="input-group-text bg-transparent border-0">
+                <i class="bi bi-search"></i>
+            </span>
         </div>
     </div>
 </div>
-*@
 
 
     <div class="mb-4">
@@ -93,28 +48,25 @@
 
     @if (Model != null && Model.Any())
     {
-        <div class="table-responsive mt-4">
-            <table class="table table-striped">
-                <thead class="table-light">
+        <div class="table-responsive mt-4 birdlog-table-card">
+            <table class="table table-striped mb-0">
+                <thead>
                     <tr>
-                        <!-- Date Column with Sort Arrows -->
                         <th class="p-3">
                             <div class="dropdown">
-                                <button class="btn btn-secondary dropdown-toggle" type="button" id="dateDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <button class="btn btn-sort dropdown-toggle" type="button" id="dateDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                     Date @(ViewBag.SortOrder == "date-asc" ? "▲" : ViewBag.SortOrder == "date-desc" ? "▼" : "")
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="dateDropdown">
-                                    <li><a class="dropdown-item" href="@Url.Action("Index", new { sortOrder = "date-asc" })">Recent Sightings</a></li>
-                                    <li><a class="dropdown-item" href="@Url.Action("Index", new { sortOrder = "date-desc" })">Oldest Sightings</a></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("Index", new { sortOrder = "date-desc" })">Recent Sightings</a></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("Index", new { sortOrder = "date-asc" })">Oldest Sightings</a></li>
                                     <li><a class="dropdown-item" href="@Url.Action("Index", new { sortOrder = "date-null" })">Null Dates First</a></li>
                                 </ul>
                             </div>
                         </th>
-
-                        <!-- Bird Column with Sort Arrows -->
                         <th class="p-3">
                             <div class="dropdown">
-                                <button class="btn btn-secondary dropdown-toggle" type="button" id="birdDropdownHeader" data-bs-toggle="dropdown" aria-expanded="false">
+                                <button class="btn btn-sort dropdown-toggle" type="button" id="birdDropdownHeader" data-bs-toggle="dropdown" aria-expanded="false">
                                     Bird @(ViewBag.SortOrder == "bird" ? "▲" : ViewBag.SortOrder == "bird-desc" ? "▼" : "")
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="birdDropdownHeader">
@@ -124,11 +76,9 @@
                                 </ul>
                             </div>
                         </th>
-
-                        <!-- Location Column with Sort Arrows -->
                         <th class="p-3">
                             <div class="dropdown">
-                                <button class="btn btn-secondary dropdown-toggle" type="button" 
+                                <button class="btn btn-sort dropdown-toggle" type="button" 
                                         id="locationDropdownHeader" data-bs-toggle="dropdown" 
                                         aria-expanded="false">
                                     Location @(ViewBag.SortOrder == "location" ? "▲" : ViewBag.SortOrder == "location-desc" ? "▼" : "")
@@ -139,12 +89,6 @@
                                     <li><a class="dropdown-item" href="@Url.Action("Index", new { sortOrder = "location-null" })">No Location First</a></li>
                                 </ul>
                             </div>
-                        </th>
-
-                        <!-- Actions Column -->
-                        <th class="p-3">
-                            Actions
-                            <button id="openFilterMenu" class="btn btn-sm btn-secondary ms-2">Filter</button>
                         </th>
                     </tr>
                 </thead>
@@ -161,7 +105,6 @@
                                 @(sighting.Bird?.CommonName ?? "Bird Species Unavailable")
                             </td>
                             <td>
-                                <!-- adding the new location from the map instead of the pnwlocations >-->
                                 @if (sighting.Latitude.HasValue && sighting.Longitude.HasValue)
                                 {
                                     <div class="location-display" 
@@ -182,10 +125,32 @@
                                     <em class="text-muted">No location data</em>
                                 }
                             </td>
-                            <td>
-                                <a asp-action="Edit" asp-route-id="@sighting.Id" class="btn btn-sm btn-warning">Edit</a>
-                                <a asp-action="Details" asp-route-id="@sighting.Id" class="btn btn-sm btn-info">Details</a>
-                                <a asp-action="Delete" asp-route-id="@sighting.Id" class="btn btn-sm btn-danger">Delete</a>
+                            <td class="text-center">
+                                <div class="dropdown">
+                                    <button class="btn btn-link p-0" 
+                                            type="button" 
+                                            data-bs-toggle="dropdown" 
+                                            aria-expanded="false"
+                                            style="color: #381D2A;"
+                                            onclick="event.stopPropagation()">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
+                                            <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                                        </svg>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end" 
+                                        style="background-color: #E9E3B4; border: 1px solid #AABD8C;"
+                                        data-bs-auto-close="outside">
+                                        <li>
+                                            <a class="dropdown-item" asp-action="Edit" asp-route-id="@sighting.Id" style="color: #381D2A;">Edit</a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-action="Details" asp-route-id="@sighting.Id" style="color: #381D2A;">Details</a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-action="Delete" asp-route-id="@sighting.Id" style="color: #381D2A;">Delete</a>
+                                        </li>
+                                    </ul>
+                                </div>
                             </td>
                         </tr>
                     }
@@ -193,7 +158,6 @@
             </table>
         </div>
     }
-
     else
     {
         <p class="text-muted mt-4">No sightings found for your account.</p>

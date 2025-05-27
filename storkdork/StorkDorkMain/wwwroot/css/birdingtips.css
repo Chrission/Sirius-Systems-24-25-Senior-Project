@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=Darumadrop+One&display=swap');
+
+:root {
+  --sd-brown: #381D2A;
+  --sd-blue: #3E6990;
+  --sd-green: #AABD8C;
+  --sd-yellow: #E9E3B4;
+  --sd-peach: #F39B6D;
+  --sd-font: 'Darumadrop One', sans-serif;
+}
+
+/* Only color cards and buttons inside birdingtips-page */
+.birdingtips-page .card {
+  border: 2px solid var(--sd-green);
+  background-color: var(--sd-yellow);
+  font-family: var(--sd-font), sans-serif;
+  font-size: 1.25rem; /* Larger base font size for all card content */
+}
+
+.birdingtips-page .card-header {
+  background-color: var(--sd-brown);
+  color: var(--sd-yellow);
+  font-family: var(--sd-font), sans-serif;
+  font-size: 1.5rem; /* Larger header */
+  font-weight: 600;
+}
+
+.birdingtips-page .card-title,
+.birdingtips-page h5.card-title,
+.birdingtips-page h4,
+.birdingtips-page h1 {
+  color: var(--sd-blue);
+  font-family: var(--sd-font), sans-serif;
+  font-weight: 600;
+  font-size: 2rem; /* Larger card titles */
+}
+
+.birdingtips-page .card-text,
+.birdingtips-page ul.card-text,
+.birdingtips-page ul.list-unstyled,
+.birdingtips-page label,
+.birdingtips-page p,
+.birdingtips-page li {
+  color: var(--sd-brown);
+  font-family: var(--sd-font), sans-serif;
+  font-size: 1.18rem; /* Larger text for all card content */
+}
+
+.birdingtips-page .btn-primary,
+.birdingtips-page .btn,
+.birdingtips-page .cta-button {
+  background-color: var(--sd-peach);
+  color: var(--sd-brown);
+  border: none;
+  font-family: var(--sd-font), sans-serif;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: background 0.2s, color 0.2s;
+  font-size: 1.15rem; /* Larger button text */
+}
+
+.birdingtips-page .btn-primary:hover,
+.birdingtips-page .btn:hover,
+.birdingtips-page .cta-button:hover {
+  background-color: var(--sd-brown);
+  color: var(--sd-yellow);
+}
+
+/* Optional: Make form controls match the theme if you use forms */
+.birdingtips-page .form-control {
+  border-color: var(--sd-green);
+  border-radius: 8px;
+  font-family: var(--sd-font), sans-serif;
+  background-color: var(--sd-yellow);
+  color: var(--sd-brown);
+  font-size: 1.15rem; /* Larger input text */
+}
+
+.birdingtips-page .form-label {
+  color: var(--sd-brown);
+  font-weight: 600;
+  font-family: var(--sd-font), sans-serif;
+  font-size: 1.15rem;
+}
+
+/* Optional: List group for selected birds, etc. */
+.birdingtips-page .list-group-item {
+  background-color: rgba(170, 189, 140, 0.2);
+  border-color: var(--sd-green);
+  font-family: var(--sd-font), sans-serif;
+  color: var(--sd-brown);
+  font-size: 1.15rem;
+}
+

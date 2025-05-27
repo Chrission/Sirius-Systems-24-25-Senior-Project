@@ -29,7 +29,7 @@
                 </div>
                 <div class="labels">
                     <div>Common: <span id="commonNameDisplay">-</span></div>
-                    <div>Latin: <span id="latinNameDisplay">-</span></div>
+                    <div>Scientific: <span id="scientificNameDisplay">-</span></div>
                 </div>
             </div>
 
@@ -89,14 +89,8 @@
                         </div>
                     </div>
 
-                    <!-- Weather -->
-                    <div class="field-row">
-                        <label>Weather</label>
-                        <input type="text" class="form-control" 
-                               placeholder="Sunny, 72°F, Calm winds" />
-                    </div>
-
                     <!-- Notes -->
+                    <label>Notes</label>
                     <textarea asp-for="Notes" 
                         class="form-control notes-textarea h-100" 
                         placeholder="Detailed observations..."
@@ -117,5 +111,6 @@
 
     
 @section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="~/js/birdlog/create.js"></script>
 }

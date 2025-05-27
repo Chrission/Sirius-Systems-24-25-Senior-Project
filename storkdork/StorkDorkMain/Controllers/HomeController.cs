@@ -22,22 +22,22 @@ public class HomeController : Controller
     public IActionResult Index()
     {
         // Test Database Connection
-        try
-        {
-            var testConnection = _context.Birds.FirstOrDefault();
-            if (testConnection != null)
-            {
-                _logger.LogInformation("Database Connected!");
-            }
-            else
-            {
-                _logger.LogWarning("Database connection successful, but no bird data founs.");
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError($"Database connection failed: {ex.Message}");
-        }
+        // try
+        // {
+        //     var testConnection = _context.Birds.FirstOrDefault();
+        //     if (testConnection != null)
+        //     {
+        //         _logger.LogInformation("Database Connected!");
+        //     }
+        //     else
+        //     {
+        //         _logger.LogWarning("Database connection successful, but no bird data founs.");
+        //     }
+        // }
+        // catch (Exception ex)
+        // {
+        //     _logger.LogError($"Database connection failed: {ex.Message}");
+        // }
 
         return View();
     }

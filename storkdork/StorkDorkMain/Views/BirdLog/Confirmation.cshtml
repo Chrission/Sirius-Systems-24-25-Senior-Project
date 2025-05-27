@@ -23,3 +23,21 @@
         </div>
     </div>
 </div>
+
+@if (ViewBag.UpdatedChecklistCount > 0)
+{
+    <div class="alert alert-success mt-3">
+        <i class="bi bi-check-circle-fill"></i>
+        This bird was automatically marked as sighted in @ViewBag.UpdatedChecklistCount of your checklists!
+    </div>
+}
+
+@if (ViewBag.CompletedChecklistCount > 0)
+{
+    <div class="alert alert-info mt-3">
+        <i class="bi bi-trophy-fill"></i>
+        <strong>Great job!</strong> You completed @ViewBag.CompletedChecklistCount 
+        @(ViewBag.CompletedChecklistCount == 1 ? "checklist" : "checklists") with this sighting!
+        Check your notifications for details.
+    </div>
+}

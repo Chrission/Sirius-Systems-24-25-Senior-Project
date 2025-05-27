@@ -2,148 +2,364 @@
 
 @{
     ViewData["Title"] = "Checklists";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <div style="display:none">
     @Html.AntiForgeryToken()
 </div>
-  
-<h1>My Bird Watching Checklists</h1>
+
+<h1 class="mt-4 container text-center mb-5" style="color: #381D2A; font-family: 'Darumadrop One', sans-serif;">My Bird Watching Checklists</h1>
 
 @if (ViewBag.NoChecklistsMessage != null)
 {
-    <div class="alert alert-info mt-3">
+    <div class="alert alert-info mt-3" style="background-color: #3E6990; color: #E9E3B4; border: none;">
         @ViewBag.NoChecklistsMessage
     </div>
 }
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Create New Checklist</a>
-</p>
+<div class="container text-center mb-4">
+    <a asp-action="Create" class="btn cta-button" style="font-family: 'Darumadrop One', sans-serif;">Create New Checklist</a>
+</div>
 
 <div class="row">
-
     @foreach (var checklist in Model)
     {
         var spotted = checklist.ChecklistItems?.Count(ci => ci.Sighted ?? false) ?? 0;
         var total = checklist.ChecklistItems?.Count ?? 0;
 
         <div class="col-md-6 mb-4">
-            <div class="card checklist-card" data-checklist-id="@checklist.Id">
-                <!-- Clickable header for collapse -->
-                <div class="card-header clickable" 
-                     data-bs-toggle="collapse" 
-                     data-bs-target="#checklist-@checklist.Id">
-                    <h5 class="card-title mb-0 d-inline">@checklist.ChecklistName</h5>
-                    <span class="badge bg-primary float-end">
-                        @checklist.ChecklistItems.Count Birds
-                    </span>
+            <div class="card checklist-card" data-checklist-id="@checklist.Id" style="border: 2px solid #AABD8C; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                <!-- Card Header -->
+                <div class="card-header d-flex justify-content-between align-items-center" 
+                     style="background-color: #381D2A; color: #E9E3B4;">
+                    <!-- Collapsible Area -->
+                    <div class="clickable-area flex-grow-1" 
+                         data-bs-toggle="collapse" 
+                         data-bs-target="#checklist-@checklist.Id">
+                        <h5 class="card-title mb-0" style="font-family: 'Darumadrop One', sans-serif;">@checklist.ChecklistName</h5>
+                    </div>
+
+                    <!-- Menu Controls -->
+                    <div class="d-flex align-items-center ms-2">
+                        <span class="badge me-2" style="background-color: #F39B6D;">
+                            @checklist.ChecklistItems.Count Birds
+                        </span>
+                        <div class="dropdown">
+                            <button class="btn btn-link p-0" 
+                                    type="button" 
+                                    data-bs-toggle="dropdown" 
+                                    aria-expanded="false"
+                                    style="color: #E9E3B4;"
+                                    onclick="event.stopPropagation()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
+                                    <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                                </svg>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" 
+                                style="background-color: #E9E3B4; border: 1px solid #AABD8C;"
+                                data-bs-auto-close="outside">
+                                <li><a class="dropdown-item" asp-action="Edit" asp-route-id="@checklist.Id" style="color: #381D2A;">Edit</a></li>
+                                <li><a class="dropdown-item" asp-action="Delete" asp-route-id="@checklist.Id" style="color: #381D2A;">Delete</a></li>
+                                <li><a class="dropdown-item" asp-action="Details" asp-route-id="@checklist.Id" style="color: #381D2A;">Details</a></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Collapsible content -->
+                <!-- Collapsible Content -->
                 <div class="collapse" id="checklist-@checklist.Id">
-                    <div class="card-body">
+                    <div class="card-body" style="background-color: #E9E3B4;">
                         <ul class="list-group">
                             @foreach (var item in checklist.ChecklistItems)
                             {
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <li class="list-group-item d-flex justify-content-between align-items-center" 
+                                    style="background-color: rgba(170, 189, 140, 0.2);">
                                     <div class="ms-2 me-auto">
                                         <input type="checkbox" 
                                                class="sighted-checkbox form-check-input me-2"
                                                data-checklist-item-id="@item.Id"
-                                               @(item.Sighted == true ? "checked" : "")>
-                                        <div class="fw-bold">@item.Bird.CommonName</div>
-                                        <div class="text-muted">@item.Bird.ScientificName</div>
+                                               @(item.Sighted == true ? "checked" : "")
+                                               style="border-color: #381D2A;">
+                                        <div class="fw-bold" style="color: #381D2A;">@item.Bird.CommonName</div>
+                                        <div class="text-muted" style="color: #3E6990;">@item.Bird.ScientificName</div>
                                     </div>
                                 </li>
                             }
                         </ul>
 
                         <div class="mt-3">
-                            <small class="text-muted mt-1 d-block text-center">
+                            <small class="d-block text-center" style="color: #3E6990;">
                                 <span class="spotted-count">@spotted out of @total birds spotted</span>
                             </small>
                         </div>
 
-                        <!-- Complete message -->
-                        <div class="alert alert-success mt-3 mb-0 complete-message" 
-                             style="display: none;">
+                        <div class="alert mt-3 mb-0 complete-message" 
+                             style="display: none; background-color: #AABD8C; color: #381D2A; border: none;">
                             <strong>Complete!</strong>
                         </div>
-                    </div>
-                </div>
-
-                <div class="card-footer">
-                    <div class="btn-group">
-                        <a asp-action="Edit" asp-route-id="@checklist.Id" 
-                           class="btn btn-sm btn-outline-secondary">Edit</a>
-                        <a asp-action="Delete" asp-route-id="@checklist.Id" 
-                           class="btn btn-sm btn-outline-danger">Delete</a>
-                        <a asp-action="Details" asp-route-id="@checklist.Id" 
-                           class="btn btn-sm btn-outline-pink">Details</a>
                     </div>
                 </div>
             </div>
         </div>
     }
 </div>
+<div class="modal fade" id="completionModal" tabindex="-1" aria-labelledby="completionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background-color: #E9E3B4; border: 2px solid #AABD8C;">
+            <div class="modal-header" style="background-color: #381D2A; color: #E9E3B4; border-color: #AABD8C;">
+                <h5 class="modal-title" id="completionModalLabel" style="font-family: 'Darumadrop One', sans-serif;">
+                    Complete Checklist?
+                </h5>
+                <button type="button" class="btn-close" style="filter: invert(1)" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="color: #381D2A;">
+                <p>All birds have been spotted! Do you want to mark this checklist as complete?</p>
+                <p><em>This action cannot be undone.</em></p>
+            </div>
+            <div class="modal-footer" style="border-color: #AABD8C;">
+                <button type="button" class="btn btn-secondary" 
+                        style="background-color: #3E6990; color: #E9E3B4; border: none;"
+                        data-bs-dismiss="modal">
+                    Cancel
+                </button>
+                <button type="button" class="btn btn-primary complete-confirm-btn" 
+                        style="background-color: #AABD8C; color: #381D2A; border: none;">
+                    Yes, Complete It!
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .checklist-card {
+        transition: transform 0.3s ease;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Hover effect when NOT in dropdown-open state */
+    .checklist-card:not(.dropdown-open):hover {
+        transform: translateY(-5px);
+        z-index: 2;
+    }
+
+    /* When dropdown is open */
+    .checklist-card.dropdown-open {
+        z-index: 3 !important;
+        transform: none !important; /* Disable hover transform */
+    }
+
+    .dropdown-menu {
+        min-width: 120px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        z-index: 1000 !important;
+    }
+
+    /* Keep other existing styles */
+    .cta-button {
+        background-color: #AABD8C;
+        color: #381D2A;
+        border: none;
+        padding: 0.6rem 1.5rem;
+        border-radius: 50px;
+        font-family: 'Darumadrop One', sans-serif;
+        transition: all 0.3s ease;
+    }
+
+    .cta-button:hover {
+        background-color: #3E6990;
+        color: #E9E3B4;
+    }
+
+    .form-check-input:checked {
+        background-color: #AABD8C;
+        border-color: #AABD8C;
+    }
+
+    .clickable-area {
+        cursor: pointer;
+        padding: 0.5rem 1rem;
+        margin: -0.5rem -1rem;
+    }
+
+    .dropdown-item {
+        transition: all 0.2s ease;
+        font-family: 'Darumadrop One', sans-serif;
+    }
+
+    .dropdown-item:hover {
+        background-color: #AABD8C;
+        color: #381D2A !important;
+    }
+
+    .bi-three-dots-vertical {
+        transition: transform 0.2s ease;
+    }
+
+    .btn-link:hover .bi-three-dots-vertical {
+        transform: scale(1.1);
+        color: #F39B6D !important;
+    }
+
+    .dropdown {
+        position: relative;
+        z-index: 100;
+    }
+
+    .modal-content {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+    .modal-header {
+        border-radius: 12px 12px 0 0;
+    }
+
+    .complete-confirm-btn {
+        font-family: 'Darumadrop One', sans-serif;
+        transition: all 0.3s ease;
+    }
+
+    .complete-confirm-btn:hover {
+        background-color: #95a97c !important;
+    }
+</style>
+
 
 @section Scripts {
     <script>
-        // JavaScript for toggling sighted status and marking checklists as complete
+        // Run this code when the whole page has loaded
         document.addEventListener('DOMContentLoaded', function () {
-            // Use event delegation for checkboxes
-            document.body.addEventListener('change', async function (event) {
-                const checkbox = event.target.closest('.sighted-checkbox');
-                if (!checkbox) return;
+            // Get the modal popup for checklist completion
+            const completionModal = new bootstrap.Modal(document.getElementById('completionModal'));
 
-                const isSighted = checkbox.checked; // Use the current state of the checkbox
+            // Variable to hold the current checklist info when completed
+            let currentChecklist = null;
+
+            // Get the anti-forgery token needed for POST requests
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            // Function to make a checklist card read-only (disable editing)
+            const enableReadOnlyMode = (card) => {
+                // Remove the 'Edit' option from the dropdown menu
+                const dropdownMenu = card.querySelector('.dropdown-menu');
+                if (dropdownMenu) {
+                    const editItem = dropdownMenu.querySelector('li:first-child');
+                    if (editItem && editItem.textContent.includes('Edit')) {
+                        editItem.remove();
+                    }
+                }
+
+                // Disable all checkboxes in the card
+                card.querySelectorAll('.sighted-checkbox').forEach(checkbox => {
+                    checkbox.disabled = true;
+                });
+
+                // Show a message indicating checklist is complete
+                card.querySelector('.complete-message').style.display = 'block';
+
+                // Add a CSS class to style the completed checklist
+                card.classList.add('completed-checklist');
+
+                // Change the cursor so it doesn't look clickable anymore
+                card.querySelector('.clickable-area').style.cursor = 'default';
+            };
+
+            // On page load, check each checklist card:
+            // If all checkboxes are checked, make it read-only
+            document.querySelectorAll('.checklist-card').forEach(card => {
+                const checkboxes = Array.from(card.querySelectorAll('.sighted-checkbox'));
+                if (checkboxes.every(checkbox => checkbox.checked)) {
+                    enableReadOnlyMode(card);
+                }
+            });
+
+            // Listen for any checkbox changes inside the page
+            document.body.addEventListener('change', async (event) => {
+                const checkbox = event.target.closest('.sighted-checkbox');
+                if (!checkbox) return;  // Ignore changes if not a checklist checkbox
+
+                const card = checkbox.closest('.checklist-card');
                 const checklistItemId = checkbox.dataset.checklistItemId;
-                const card = checkbox.closest('.card');
 
                 try {
-                    const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
-                    if (!token) {
-                        console.error('Anti-forgery token not found');
-                        return;
-                    }
-
-                    const response = await fetch(`/Checklists/ToggleSighted/${checklistItemId}?sighted=${isSighted}`, {
+                    // Send update to server about the checkbox state (checked or unchecked)
+                    const response = await fetch(`/Checklists/ToggleSighted/${checklistItemId}?sighted=${checkbox.checked}`, {
                         method: 'POST',
-                        headers: {
-                            'RequestVerificationToken': token
-                        }
+                        headers: { 'RequestVerificationToken': token }
                     });
 
                     if (!response.ok) throw new Error('Server error');
 
                     const data = await response.json();
-                    console.log('Server response:', data); // Log the server response
 
                     if (data.success) {
-                        // Update spotted count
+                        // Update the text that shows how many birds are spotted
                         const spottedCount = card.querySelector('.spotted-count');
-                        if (spottedCount) {
-                            spottedCount.textContent = `${data.spotted} out of ${data.total} birds spotted`;
-                        }
+                        spottedCount.textContent = `${data.spotted} out of ${data.total} birds spotted`;
 
-                        // Check if all checkboxes are checked
-                        const checkboxes = card.querySelectorAll('.sighted-checkbox');
-                        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-
-                        // Show or hide the complete message
-                        const completeMessage = card.querySelector('.complete-message');
-                        if (completeMessage) {
-                            completeMessage.style.display = allChecked ? 'block' : 'none';
+                        // If all birds are spotted, save info and show the completion popup
+                        if (data.spotted === data.total) {
+                            currentChecklist = {
+                                card,
+                                checklistItemId,
+                                spotted: data.spotted,
+                                total: data.total
+                            };
+                            completionModal.show();
                         }
-                    } else {
-                        // Revert the checkbox state if the server request fails
-                        checkbox.checked = !isSighted;
                     }
                 } catch (error) {
+                    // If error, log it and undo the checkbox change
                     console.error('Error:', error);
-                    // Revert the checkbox state if there's an error
-                    checkbox.checked = !isSighted;
+                    checkbox.checked = !checkbox.checked;
                 }
+            });
+
+            // When the user confirms completion in the modal popup
+            document.querySelector('.complete-confirm-btn').addEventListener('click', () => {
+                if (currentChecklist) {
+                    // Make the checklist read-only and close the popup
+                    enableReadOnlyMode(currentChecklist.card);
+                    completionModal.hide();
+                    currentChecklist = null;
+                }
+            });
+
+            // If the modal is closed without confirming completion
+            document.getElementById('completionModal').addEventListener('hidden.bs.modal', () => {
+                if (currentChecklist) {
+                    // Undo the last checkbox change and update the count on UI and server
+                    const { card, checklistItemId, spotted, total } = currentChecklist;
+                    const checkbox = card.querySelector(`[data-checklist-item-id="${checklistItemId}"]`);
+
+                    checkbox.checked = false;
+                    card.querySelector('.spotted-count').textContent = `${spotted - 1} out of ${total} birds spotted`;
+
+                    fetch(`/Checklists/ToggleSighted/${checklistItemId}?sighted=false`, {
+                        method: 'POST',
+                        headers: { 'RequestVerificationToken': token }
+                    });
+
+                    currentChecklist = null;
+                }
+            });
+
+            // Add or remove a CSS class on the checklist card when dropdown menu opens or closes
+            document.querySelectorAll('.dropdown').forEach(dropdown => {
+                dropdown.addEventListener('show.bs.dropdown', function () {
+                    this.closest('.checklist-card').classList.add('dropdown-open');
+                });
+
+                dropdown.addEventListener('hide.bs.dropdown', function () {
+                    this.closest('.checklist-card').classList.remove('dropdown-open');
+                });
+            });
+
+            // Prevent clicks inside dropdown menu from closing the dropdown
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                menu.addEventListener('click', (e) => e.stopPropagation());
             });
         });
     </script>

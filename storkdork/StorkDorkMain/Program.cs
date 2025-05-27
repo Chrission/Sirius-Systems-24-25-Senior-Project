@@ -182,6 +182,10 @@ app.MapControllerRoute(
     pattern: "Admin/{action=Index}/{id?}",
     defaults: new { controller = "Admin" });
 
+app.MapControllerRoute(
+    name: "nearbysightings",
+    pattern: "NearbySightings/{action=Index}/{id?}");
+
 // Needed for identity ui routing to work
 app.MapRazorPages();
 

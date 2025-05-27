@@ -1,43 +1,64 @@
-<a asp-controller="Home" asp-action="Index" class="text-decoration-none text-dark" class="btn btn-primary btn-sm">Go Back To Home Page</a>
+<link href="https://fonts.googleapis.com/css2?family=Darumadrop+One&display=swap" rel="stylesheet" />
+
+<a asp-controller="Home" asp-action="Index"
+   class="btn btn-primary btn-sm mb-4"
+   style="background: #F39B6D; color: #381D2A; border: none; font-family: 'Darumadrop One', sans-serif; font-weight: 600; border-radius: 8px;">
+  &larr; Go Back To Home Page
+</a>
 
 <div class="min-vh-100 d-flex align-items-center justify-content-center py-5">
-    <section class="container" style="max-width: 1400px;">
-        <div class="row g-4 justify-content-center">
-            <!-- Card 1 -->
-            <div class="col-md-4">
-                <a asp-controller="BirdingTips" asp-action="Table_of_Contents" class="text-decoration-none text-dark">
-                    <div class="card h-100 shadow-lg" style="min-height: 400px;">
-                        <div class="placeholder-img bg-light display-5 p-4">Novice</div>
-                        <div class="card-body text-center p-4">
-                            <p class="card-text fs-5 mt-3">Start here if you're new to bird watching!</p>
-                        </div>
-                    </div>
-                </a>
+  <section class="container" style="max-width: 1400px;">
+    <div class="row g-4 justify-content-center">
+      <!-- Card 1 -->
+      <div class="col-md-4">
+        <a asp-controller="BirdingTips" asp-action="Table_of_Contents" class="text-decoration-none">
+          <div class="card h-100 shadow-lg"
+               style="min-height: 400px; background: #E9E3B4; border: 2px solid #AABD8C; border-radius: 16px; box-shadow: 0 4px 16px rgba(56,29,42,0.10); font-family: 'Darumadrop One', sans-serif;">
+            <div style="background: #AABD8C; color: #381D2A; border-radius: 12px 12px 0 0; font-size: 2.5rem; font-weight: 700; letter-spacing: 1px; text-align: center; padding: 2.5rem 2rem;">
+              Novice
             </div>
+            <div class="card-body text-center p-4">
+              <p class="card-text mt-3" style="color: #381D2A; font-size: 1.45rem; font-family: 'Darumadrop One', sans-serif;">
+                Start here if you're new to bird watching!
+              </p>
+            </div>
+          </div>
+        </a>
+      </div>
 
-            <!-- Card 2 -->
-            <div class="col-md-4">
-                <a asp-controller="BirdingTips" asp-action="Table_of_Contents_Intermediate" class="text-decoration-none text-dark">
-                    <div class="card h-100 shadow-lg" style="min-height: 400px;">
-                        <div class="placeholder-img bg-light display-5 p-4">Intermediate</div>
-                        <div class="card-body text-center p-4">
-                            <p class="card-text fs-5 mt-3">Take your skills to the next level</p>
-                        </div>
-                    </div>
-                </a>
+      <!-- Card 2 -->
+      <div class="col-md-4">
+        <a asp-controller="BirdingTips" asp-action="Table_of_Contents_Intermediate" class="text-decoration-none">
+          <div class="card h-100 shadow-lg"
+               style="min-height: 400px; background: #E9E3B4; border: 2px solid #AABD8C; border-radius: 16px; box-shadow: 0 4px 16px rgba(56,29,42,0.10); font-family: 'Darumadrop One', sans-serif;">
+            <div style="background: #AABD8C; color: #381D2A; border-radius: 12px 12px 0 0; font-size: 2.5rem; font-weight: 700; letter-spacing: 1px; text-align: center; padding: 2.5rem 2rem;">
+              Intermediate
             </div>
+            <div class="card-body text-center p-4">
+              <p class="card-text mt-3" style="color: #381D2A; font-size: 1.45rem; font-family: 'Darumadrop One', sans-serif;">
+                Take your skills to the next level
+              </p>
+            </div>
+          </div>
+        </a>
+      </div>
 
-            <!-- Card 3 -->
-            <div class="col-md-4">
-                <a asp-controller="BirdingTips" asp-action="Expert" class="text-decoration-none text-dark">
-                    <div class="card h-100 shadow-lg" style="min-height: 400px;">
-                        <div class="placeholder-img bg-light display-5 p-4">Expert</div>
-                        <div class="card-body text-center p-4">
-                            <p class="card-text fs-5 mt-3">Master advanced techniques</p>
-                        </div>
-                    </div>
-                </a>
+      <!-- Card 3 -->
+      <div class="col-md-4">
+          <div class="card h-100 shadow-lg"
+               style="min-height: 400px; background: #E9E3B4; border: 2px solid #AABD8C; border-radius: 16px; box-shadow: 0 4px 16px rgba(56,29,42,0.10); font-family: 'Darumadrop One', sans-serif;">
+            <div style="background: #AABD8C; color: #381D2A; border-radius: 12px 12px 0 0; font-size: 2.5rem; font-weight: 700; letter-spacing: 1px; text-align: center; padding: 2.5rem 2rem;">
+              Expert
             </div>
-        </div>
-    </section>
+            <div class="card-body text-center p-4">
+              <p class="card-text mt-3" style="color: #381D2A; font-size: 1.45rem; font-family: 'Darumadrop One', sans-serif;">
+                Master advanced techniques
+                (Under Construction)
+              </p>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
 </div>

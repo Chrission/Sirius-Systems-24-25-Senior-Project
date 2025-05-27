@@ -21,21 +21,45 @@
             }
         </div>
     </div>
-    <form method="post" enctype="multipart/form-data" asp-page-handler="UploadImage">
-        <div class="form-group mb-3">
-            <label for="profileImage" class="form-label">Upload New Profile Image</label>
-            <input type="file" name="ProfileImage" class="form-control" accept="image/*" />
-        </div>
-        <button type="submit" class="btn btn-primary">Upload</button>
-    </form>
+    <div class="col-6">
+        <form method="post" enctype="multipart/form-data" asp-page-handler="UploadImage">
+            <div class="form-group mb-3">
+                <label for="profileImage" class="form-label descriptive-text">Upload New Profile Image</label>
+                <input type="file" name="ProfileImage" class="form-control" style="max-width: 300px;"
+                    accept="image/*" />
+            </div>
+            <button type="submit" class="btn storkdork-button rounded-pill">Upload</button>
+        </form>
 
-    <form method="post" asp-page-handler="RemoveImage" class="my-2">
-        <button type="submit" class="btn btn-danger">Remove Profile Image</button>
-    </form>
-
+        <form method="post" asp-page-handler="RemoveImage" class="my-2">
+            <button type="submit" class="btn storkdork-button">Remove Profile Image</button>
+        </form>
+    </div>
     <div class="col-md-6">
-        <div class="card mb-4">
-            <div class="card-header">
+        <div class="card storkdork-card mb-4">
+            <div class="card-header descriptive-text">
+                Privacy Settings
+            </div>
+            <div class="card-body">
+                <form id="settings-form" method="post" asp-page-handler="SaveSettings">
+                    <input type="hidden" asp-for="UserSettings.Id" />
+                    <input type="hidden" asp-for="UserSettings.SdUserId" />
+
+                    <div class="form-check mb-2">
+                        <input type="checkbox" asp-for="UserSettings.AnonymousSightings" class="form-check-input" id="anonymous-birder" />
+                        <label asp-for="UserSettings.AnonymousSightings" class="form-check-label">
+                            I want my sightings to be anonymous
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn storkdork-button">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card mb-4 storkdork-card">
+            <div class="card-header descriptive-text">
                 Personal Information
             </div>
             <div class="card-body">
@@ -43,15 +67,15 @@
                 <p><strong>Email:</strong> @Model.Email</p>
 
                 @* <a class="btn btn-primary" asp-page="./ChangeEmail">Edit Email</a> *@
-                <a class="btn btn-secondary" asp-page="./ChangePassword">Change Password</a>
-                <a class="btn btn-secondary" asp-page="./ChangeDisplayName">Change Display Name</a>
+                <a class="btn storkdork-button" asp-page="./ChangePassword">Change Password</a>
+                <a class="btn storkdork-button" asp-page="./ChangeDisplayName">Change Display Name</a>
             </div>
         </div>
     </div>
 
     <div class="col-md-6">
-        <div class="card mb-4">
-            <div class="card-header">
+        <div class="card storkdork-card mb-4">
+            <div class="card-header descriptive-text">
                 Bird-Watching Statistics
             </div>
             <div class="card-body">

@@ -22,14 +22,52 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
-  background-color: #F2F8DB;
-  background-image: url("https://transparenttextures.com/patterns/nice-snow.png");
 
+  font-family: 'Montserrat', sans-serif;
+
+  background-color: #F2F8DB; /* main background */
+
+  background-image: 
+      repeating-linear-gradient(
+          45deg,
+          rgba(170, 189, 140, 0.15) 25%,   /* lighter, 15% opacity */
+          transparent 25%,
+          transparent 40%,
+          rgba(170, 189, 140, 0.15) 40%, 
+          rgba(170, 189, 140, 0.15)
+      ),
+      repeating-linear-gradient(
+          45deg,
+          rgba(170, 189, 140, 0.15) 25%, 
+          rgba(170, 189, 140, 0.15) 25%, 
+          rgba(242, 248, 219, 0.07) 75%,  /* even lighter overlay */
+          rgba(170, 189, 140, 0.15) 75%, 
+          rgba(170, 189, 140, 0.15)
+      );
+  background-position: 0 0, 10px 10px;
+  background-size: 20px 20px;
+  animation: moveBackground 20s linear infinite;
+  
+  
 }
+
+@keyframes moveBackground {
+    0% {
+        background-position: 0 0, 10px 10px;
+    }
+    100% {
+        background-position: 100px 100px, 110px 110px;
+    }
+}
+
 
 nav {
   background-color: #aabd8c;
+}
+
+h1, .descriptive-text {
+  font-family: 'Darumadrop One', sans-serif; 
+  color: #381D2A;
 }
 
 .nav-link {
@@ -54,21 +92,65 @@ nav {
 .nav-link:focus,
 .nav-link:active {
   color: #fcf2e0 !important;
-  background-color: #f2f8db; /* optional, remove if not needed */
+  background-color: #f2f8db; 
   text-decoration: none;
   outline: none;
 }
 
-#map {
-  height: 40lh;
+.storkdork-button {
+  background-color: #381D2a;
+  color: white;
 }
 
-/* Style the notification button and bell icon */
-#notificationsDropdown {
-  padding: 0.5rem 0.75rem;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
+.storkdork-button:hover {
+  background-color: #5A2E43;
+  color: white;
+}
+
+.forms-div {
+  background-color: #fff8f0;
+  height: auto;
+  width: auto;
+  border-radius: 25px;  
+  border-color: #381D2A;
+  border-width: 10px;
+  border-style: solid;
+  overflow: hidden;
+  padding-top: 25px;
+  padding-bottom: 50px;
+  padding-left: 50px;
+  padding-right: 50px;
+  margin-top: 25px;
+  box-shadow: -10px 10px 10px -3px #41333A;
+}
+
+.input-style:focus {
+  border-color: #381D2A;
+  border-width: 3px;
+  border-radius: 5px;
+  border-style: solid;
+  box-shadow: none;
+}
+
+.hyperlink-style {
+  color: #381D2A;
+}
+
+.hyperlink-style:hover {
+  color: #A98295;
+}
+
+.storkdork-card {
+  background-color: #fff8f0;
+  height: auto;
+  width: auto;
+  border-radius: 25px;  
+  border-color: #381D2A;
+  border-width: 10px;
+  border-style: solid;
+  overflow: hidden;
+  margin-top: 25px;
+  box-shadow: -10px 10px 10px -3px #41333A;
 }
 
 .nav-item .bi-bell {
@@ -139,8 +221,15 @@ nav {
   background-color: white;
 }
 
-
-h1 {
-  font-family: 'Darumadrop One', sans-serif; 
-  color: #381D2A;
+#map {
+  height: 40lh;
 }
+
+/* Style the notification button and bell icon */
+#notificationsDropdown {
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+

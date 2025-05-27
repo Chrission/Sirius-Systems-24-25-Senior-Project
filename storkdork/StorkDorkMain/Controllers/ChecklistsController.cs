@@ -193,10 +193,17 @@ namespace StorkDorkMain.Controllers
                 return NotFound();
             }
 
-            var allBirds = await _context.Birds.ToListAsync();
+            var allBirds = await _context.Birds
+            .Select(b => new {
+                b.Id,
+                CommonName = b.CommonName ?? "(Unnamed bird)"
+            })
+            .ToListAsync();
+
             var selectedBirdIds = checklist.ChecklistItems.Select(c => c.BirdId).ToList();
 
             ViewBag.AllBirds = new MultiSelectList(allBirds, "Id", "CommonName", selectedBirdIds);
+
             ViewBag.SelectedUserId = checklist.SdUserId;
 
             return View(checklist);
