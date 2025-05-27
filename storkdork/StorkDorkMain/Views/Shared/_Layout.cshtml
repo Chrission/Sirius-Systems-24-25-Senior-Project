@@ -162,6 +162,30 @@
                 min-width: auto;
             }
         }
+        /*
+        .top-navbar {
+            background-color: #AABD8C;
+            height: 60px;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            background-image: url("https://www.transparenttextures.com/patterns/elegant-grid.png");
+        }
+
+        .sidebar {
+            margin-top: 60px;
+            min-height: calc(100vh - 60px);
+        }
+
+        .content {
+            margin-top: 60px;
+            min-height: calc(100vh - 60px);
+        }
+        */
+
+        
     </style>
 </head>
 
@@ -253,6 +277,24 @@
             @TempData["SuccessMessage"]
         </div>
     }
+@* 
+<nav class="top-navbar">
+    <div class="container-fluid h-100">
+        <div class="row h-100 align-items-center">
+            <!-- Navbar content -->
+            <div class="col">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index" 
+                   style="display: flex; align-items: center; height: 100%; padding-left: 1rem;">
+                    <img src="~/images/StorkDork-NoMascot.svg" 
+                         alt="Stork Dork" 
+                         style="height: 40px; width: auto; vertical-align: middle;">
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+*@
+
 
     <!-- Main Header -->
     <header class="main-header">
@@ -411,6 +453,11 @@
                                 </a>
                             </li>
                         }
+                        <li class="nav-item"></li>
+                            <a class="nav-link text-dark" asp-controller="BirdingTips" asp-action="Index">
+                                <i class="bi bi-binoculars-fill me-2"></i> Birdings Tips 
+                            </a>
+                        </li>
 
                         @if (User.Identity.IsAuthenticated)
                         {
