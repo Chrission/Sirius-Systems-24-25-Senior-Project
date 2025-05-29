@@ -29,23 +29,6 @@
 </div>
 
 
-    <div class="mb-4">
-        <div class="input-group rounded-pill shadow-sm">
-            <input type="text" id="globalSearch" 
-                class="form-control rounded-pill" 
-                placeholder="Search birds or locations..."
-                aria-label="Search">
-            <button id="clearSearch" class="btn btn-link text-muted" 
-                    style="margin-left: -40px; z-index: 100; display: none;">
-                <i class="bi bi-x-circle"></i>
-            </button>
-            <span class="input-group-text bg-transparent border-0">
-                <i class="bi bi-search"></i>
-            </span>
-        </div>
-    </div>
-
-
     @if (Model != null && Model.Any())
     {
         <div class="table-responsive mt-4 birdlog-table-card">

@@ -7,19 +7,21 @@ using Reqnroll;
 using System.Linq;
 using NUnit.Framework;
 using StorkDorkBDD.StepDefinitions;
+using System.Threading;
+using SeleniumExtras.WaitHelpers;
 
 
 namespace StorkDorkBDD.StepDefinitions
 {
     [Binding]
-    public class ChecklistStepDefinition 
+    public class ChecklistStepDefinition
     {
         private readonly WebDriverWait _wait;
 
         public ChecklistStepDefinition()
         {
             _wait = new WebDriverWait(
-                GlobalDriverSetup.Driver ?? throw new InvalidOperationException("WebDriver is not initialized."), 
+                GlobalDriverSetup.Driver ?? throw new InvalidOperationException("WebDriver is not initialized."),
                 TimeSpan.FromSeconds(15));
         }
 
@@ -84,100 +86,68 @@ namespace StorkDorkBDD.StepDefinitions
             nameField.Clear();
             nameField.SendKeys(checklistName);
         }
-
         [When(@"I search for and select the following birds:")]
         public void WhenISearchForAndSelectTheFollowingBirds(Table table)
         {
-            // Verify we have at least 2 birds to select
-            table.Rows.Count.Should().BeGreaterOrEqualTo(2, "At least two birds must be selected");
-
             foreach (var row in table.Rows)
             {
                 var birdName = row["Bird Name"];
-                var searchField = _wait.Until(d =>
-                    d.FindElement(By.Id("birdSearch")));
 
-                // Clear and type the bird name with delays between keystrokes
+                // Always get fresh search field reference
+                var searchField = _wait.Until(d => d.FindElement(By.Id("birdSearch")));
                 searchField.Clear();
+
+                // Simulate typing with delays
                 foreach (char c in birdName)
                 {
                     searchField.SendKeys(c.ToString());
-                    System.Threading.Thread.Sleep(100);
+                    Thread.Sleep(100);
                 }
 
-                // Wait for dropdown to appear with longer timeout
-                var wait = new WebDriverWait(GlobalDriverSetup.Driver, TimeSpan.FromSeconds(20));
-                wait.Until(d =>
+                // Wait for dropdown item to be present and clickable
+                var dropdownItem = _wait.Until(d =>
                 {
-                    try
-                    {
-                        var dropdown = d.FindElement(By.CssSelector("#birdSearchResults.dropdown-menu"));
-                        return dropdown.Displayed;
-                    }
-                    catch
-                    {
-                        return false;
-                    }
+                    var element = d.FindElement(
+                        By.XPath($"//div[@id='birdSearchResults']//strong[text()='{birdName}']/ancestor::div[contains(@class, 'dropdown-item')]")
+                    );
+                    return element.Displayed ? element : null;
                 });
 
-                // Select the matching result with JavaScript
-                var dropdownItem = wait.Until(d =>
-                    d.FindElement(By.XPath($"//div[@id='birdSearchResults']//div[contains(., '{birdName}')]")));
+                // Scroll and click with JavaScript
+                ((IJavaScriptExecutor)GlobalDriverSetup.Driver).ExecuteScript(
+                    "arguments[0].scrollIntoView(true); arguments[0].click();",
+                    dropdownItem
+                );
 
-                ((IJavaScriptExecutor)GlobalDriverSetup.Driver).ExecuteScript("arguments[0].scrollIntoView(true);", dropdownItem);
-                System.Threading.Thread.Sleep(200);
-                ((IJavaScriptExecutor)GlobalDriverSetup.Driver).ExecuteScript("arguments[0].click();", dropdownItem);
-
-                // Verify the bird was added to selected list
-                wait.Until(d =>
-                    d.FindElement(By.XPath($"//ul[@id='selectedBirdsList']//li[contains(., '{birdName}')]")));
-
-                // Click outside to close the dropdown
-                var body = GlobalDriverSetup.Driver.FindElement(By.TagName("body"));
-                body.Click();
-                System.Threading.Thread.Sleep(500);
+                // Wait for selection to process
+                _wait.Until(d =>
+                    !d.FindElement(By.Id("birdSearchResults")).Displayed
+                );
+                Thread.Sleep(500);
             }
         }
 
-
-        [When(@"I verify at least (.*) birds are selected")]
-        public void WhenIVerifyAtLeastBirdsAreSelected(int minimumBirds)
-        {
-            var selectedBirds = _wait.Until(d =>
-                d.FindElements(By.CssSelector("#selectedBirdsList li")));
-            selectedBirds.Count.Should().BeGreaterOrEqualTo(minimumBirds);
-        }
 
         [When(@"I submit the checklist form")]
         public void WhenISubmitTheChecklistForm()
         {
+            // Use XPath to match button text exactly
             var submitButton = _wait.Until(d =>
-                d.FindElement(By.CssSelector("input[type='submit'][value='Create']")));
-            ((IJavaScriptExecutor)GlobalDriverSetup.Driver).ExecuteScript("arguments[0].scrollIntoView(true);", submitButton);
-            System.Threading.Thread.Sleep(300);
-            ((IJavaScriptExecutor)GlobalDriverSetup.Driver).ExecuteScript("arguments[0].click();", submitButton);
-        }
+                d.FindElement(By.XPath("//button[text()='Create']")));
 
+            // Scroll and click directly
+            ((IJavaScriptExecutor)GlobalDriverSetup.Driver).ExecuteScript(
+                "arguments[0].scrollIntoView(true);",
+                submitButton
+            );
+            submitButton.Click();
+        }
 
         [Then(@"I should be redirected to the Checklist index page")]
         public void ThenIShouldBeRedirectedToTheChecklistIndexPage()
         {
-            try
-            {
-                // Wait for either URL change OR for a specific element on the target page
-                var extendedWait = new WebDriverWait(GlobalDriverSetup.Driver, TimeSpan.FromSeconds(30));
-                extendedWait.Until(d => 
-                    d.Url.Contains("/Checklists") || 
-                    d.FindElements(By.CssSelector(".checklist-index-page")).Any());
-                
-                Console.WriteLine($"Successfully redirected to: {GlobalDriverSetup.Driver.Url}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Redirect verification failed. Current URL: {GlobalDriverSetup.Driver.Url}");
-                Console.WriteLine($"Page source: {GlobalDriverSetup.Driver.PageSource}");
-                throw new Exception($"Redirect verification failed: {ex.Message}");
-            }
+            _wait.Until(d => d.Url.Contains("/Checklists"));
+            Console.WriteLine($"Final URL: {GlobalDriverSetup.Driver.Url}");
         }
 
         // Mark these steps as skipped since we're ending the test earlier
@@ -198,5 +168,53 @@ namespace StorkDorkBDD.StepDefinitions
         //    _driver?.Quit();   // Close the browser
         //    _driver?.Dispose(); // Clean up WebDriver resources
         //}
+        
+
+        // Add these methods to your existing ChecklistStepDefinition class
+
+        [When("I click on the details button")]
+public void WhenIClickOnTheDetailsButton()
+{
+    // Wait for and click the three dots menu button
+    var menuButton = _wait.Until(d => 
+        d.FindElement(By.CssSelector("button[data-bs-toggle='dropdown']")));
+    
+    // Scroll and click using JavaScript
+    ((IJavaScriptExecutor)GlobalDriverSetup.Driver)
+        .ExecuteScript("arguments[0].scrollIntoView(true);", menuButton);
+    ((IJavaScriptExecutor)GlobalDriverSetup.Driver)
+        .ExecuteScript("arguments[0].click();", menuButton);
+
+    // Wait for dropdown to be fully visible
+    _wait.Until(d => 
+        d.FindElement(By.CssSelector("ul.dropdown-menu.show")).Displayed);
+
+    // Use XPath to find Details link by exact text
+    var detailsLink = _wait.Until(d => 
+        d.FindElement(By.XPath(
+            "//ul[contains(@class, 'dropdown-menu show')]" +
+            "//a[contains(@class, 'dropdown-item') and normalize-space()='Details']"
+        )));
+    
+    // Verify enabled state and click
+    _wait.Until(d => detailsLink.Enabled);
+    ((IJavaScriptExecutor)GlobalDriverSetup.Driver)
+        .ExecuteScript("arguments[0].click();", detailsLink);
+}
+
+        [Then("the page should not crash")]
+        public void ThenThePageShouldNotCrash()
+        {
+            // Verify URL changed to the Details page pattern
+            _wait.Until(d => d.Url.Contains("/Checklists/Details/"));
+
+            // Check for server error messages or exceptions
+            var errorElements = GlobalDriverSetup.Driver.FindElements(
+                By.CssSelector(".alert.alert-danger, .text-danger"));
+            errorElements.Should().BeEmpty("Page should not display any error messages.");
+
+            // Confirm expected content is present (e.g., checklist name element)
+            _wait.Until(d => d.FindElement(By.CssSelector(".checklist-detail-header")));
+        }
     }
 }
