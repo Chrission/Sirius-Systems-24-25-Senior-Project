@@ -1,43 +1,62 @@
 @{
     ViewData["Title"] = "Log Created Successfully";
-    bool hasPhoto = ViewBag.HasPhoto ?? false; // Default to false if null
+    bool hasPhoto = ViewBag.HasPhoto ?? false;
 }
 
 @if (hasPhoto)
 {
-    <div class="mt-4">
-        <h4>Uploaded Photo</h4>
-        <img src="@Url.Action("GetSightingImage", "BirdLog", new { id = Model.Id })" 
-             class="img-thumbnail" style="max-height: 300px;" />
+    <div class="mt-4 container">
+        <h4 style="font-family: 'Darumadrop One', sans-serif; color: #381D2A;">Uploaded Photo</h4>
+        <img src="@Url.Action("GetSightingImage", "BirdLog", new { id = Model.Id })"
+             class="img-thumbnail"
+             style="max-height: 300px; border: 2px solid #AABD8C; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
     </div>
 }
 
 <div class="container mt-5">
-    <div class="card">
-        <div class="card-body text-center">
-            <h1 class="card-title">🎉 Log Created Successfully!</h1>
-            <p class="card-text">What would you like to do next? <strong>@ViewBag.UserName</strong></p>
+    <div class="card" style="border: 2px solid #AABD8C; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+        <div class="card-body text-center" style="background-color: #E9E3B4;">
+            <h1 class="card-title mb-3"
+                style="font-family: 'Darumadrop One', sans-serif; color: #381D2A;">
+                🎉 Log Created Successfully!
+            </h1>
+            <p class="card-text mb-4" style="color: #3E6990;">
+                What would you like to do next? <strong>@ViewBag.UserName</strong>
+            </p>
 
-            <a href="@Url.Action("Index", new { userId = ViewBag.UserId })" class="btn btn-primary">View Logs</a>
-            <a href="@Url.Action("Create", new { userId = ViewBag.UserId })" class="btn btn-secondary">Log Another Sighting</a>
+            <a href="@Url.Action("Index", new { userId = ViewBag.UserId })"
+               class="btn cta-button me-2"
+               style="flex: 1;">
+                View Logs
+            </a>
+            <a href="@Url.Action("Create", new { userId = ViewBag.UserId })"
+               class="btn btn-secondary"
+               style="flex: 1; background-color: #381D2A; color: #E9E3B4; border: none;">
+                Log Another Sighting
+            </a>
         </div>
     </div>
 </div>
 
 @if (ViewBag.UpdatedChecklistCount > 0)
 {
-    <div class="alert alert-success mt-3">
+    <div class="alert mt-3"
+         style="background-color: #AABD8C; color: #381D2A; border: none;">
         <i class="bi bi-check-circle-fill"></i>
-        This bird was automatically marked as sighted in @ViewBag.UpdatedChecklistCount of your checklists!
+        This bird was automatically marked as sighted in
+        <strong>@ViewBag.UpdatedChecklistCount</strong>
+        @(ViewBag.UpdatedChecklistCount == 1 ? "checklist" : "checklists")!
     </div>
 }
 
 @if (ViewBag.CompletedChecklistCount > 0)
 {
-    <div class="alert alert-info mt-3">
+    <div class="alert mt-3"
+         style="background-color: #3E6990; color: #E9E3B4; border: none;">
         <i class="bi bi-trophy-fill"></i>
-        <strong>Great job!</strong> You completed @ViewBag.CompletedChecklistCount 
-        @(ViewBag.CompletedChecklistCount == 1 ? "checklist" : "checklists") with this sighting!
-        Check your notifications for details.
+        <strong>Great job!</strong> You completed
+        <strong>@ViewBag.CompletedChecklistCount</strong>
+        @(ViewBag.CompletedChecklistCount == 1 ? "checklist" : "checklists")
+        with this sighting! Check your notifications for details.
     </div>
 }

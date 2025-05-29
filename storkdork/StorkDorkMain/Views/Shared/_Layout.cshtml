@@ -32,241 +32,651 @@
 
     <!-- Inline Styles -->
     <style>
-        /* Sidebar base */
+        /* CSS Variables */
+        :root {
+            --primary-color: #AABD8C;
+            --text-color: #f2fce0;
+            --accent-color: #F3936D;
+            --header-height: 90px; /* Increased for larger logo */
+        }
+
+        /* base styling */
+        body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* desktop sidebar styling */
         .sidebar {
-            background-color: #AABD8C;
+            background-color: var(--primary-color);
             background-image: url("https://www.transparenttextures.com/patterns/elegant-grid.png");
             font-family: 'Darumadrop One', sans-serif;
-            min-height: 100vh;
-            border-right: 1px solid #f2fce0;
-            font-size: 20px;
-            margin-top: 60px;
-            min-height: calc(100vh - 60px);
+            min-height: calc(100vh - var(--header-height));
+            border-right: 1px solid var(--text-color);
+            font-size: 18px;
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            width: 250px;
+            z-index: 1000;
+            overflow-y: auto;
         }
 
         .sidebar .nav-link,
         .sidebar .navbar-brand {
-            color: #f2fce0 !important;
+            color: var(--text-color) !important;
             -webkit-text-stroke: 0.7px black;
+            font-size: 16px;
         }
 
         .sidebar .nav-link:hover,
         .sidebar .navbar-brand:hover {
-            color: #F3936D;
+            color: var(--accent-color);
             background-color: rgba(255, 255, 255, 0.1);
             border-radius: 5px;
         }
 
-        /* Navigation link padding */
+        /* nav link padding */
         .nav-link {
-            padding: 0.5rem 1rem;
+            padding: 0.75rem 1rem;
         }
 
         /* Main content wrapper */
         .content {
             padding: 1rem;
-            margin-top: 60px;
-            min-height: calc(100vh - 60px);
+            margin-top: var(--header-height);
+            min-height: calc(100vh - var(--header-height));
         }
 
         /* Header */
         .main-header {
-            background-color: #AABD8C;
+            background-color: var(--primary-color);
             background-image: url("https://www.transparenttextures.com/patterns/elegant-grid.png");
-            height: 60px;
+            height: var(--header-height);
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            z-index: 1000;
+            z-index: 1050;
             display: flex;
             align-items: center;
-            padding: 0 16px;
-            gap: 16px;
+            padding: 0 20px;
+            gap: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        .header-logo-section,
+        .header-logo-section {
+            display: flex;
+            align-items: center;
+            min-width: 280px;
+        }
+
         .header-user-section {
             display: flex;
             align-items: center;
-            min-width: 150px;
+            min-width: 200px;
+            justify-content: flex-end;
+            gap: 10px;
         }
 
         .header-search-section {
             flex-grow: 1;
             display: flex;
             justify-content: center;
+            max-width: 800px;
         }
 
+        /* LOGO STYLING */
+        .navbar-brand {
+            color: var(--text-color) !important;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            transition: transform 0.2s ease;
+        }
+
+        .navbar-brand:hover {
+            color: var(--accent-color) !important;
+            transform: scale(1.05);
+        }
+
+        .header-logo img {
+            height: 65px; 
+            width: auto;
+            max-width: none;
+            object-fit: contain;
+            filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.3));
+        }
+
+        /* SEARCH CONTAINER AND DROPDOWN */
         .search-container {
             width: 100%;
             max-width: 600px;
-            min-width: 200px;
+            min-width: 300px;
             position: relative;
         }
 
+        .search-input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        #homepageSearchInput {
+            border: 2px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.95);
+            font-size: 16px;
+            padding: 12px 50px 12px 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        #homepageSearchInput:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(243, 147, 109, 0.2);
+            background: white;
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--accent-color);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+
+        .search-btn:hover {
+            background: #e67d54;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        #clearSearch {
+            position: absolute;
+            right: 50px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #6c757d;
+            font-size: 18px;
+            cursor: pointer;
+            z-index: 10;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        #clearSearch:hover {
+            background: rgba(108, 117, 125, 0.1);
+            color: #495057;
+        }
+
+        /* SEARCH RESULTS DROPDOWN */
         .search-results-dropdown {
             position: absolute;
-            width: 100%;
-            max-height: 300px;
-            overflow-y: auto;
+            top: 100%;
+            left: 0;
+            right: 0;
             background: white;
-            border: 1px solid #ddd;
+            border: 2px solid rgba(255,255,255,0.3);
             border-top: none;
-            border-radius: 0 0 8px 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
             z-index: 1000;
             display: none;
+            max-height: 400px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-color) #f0f0f0;
+        }
+
+        .search-results-dropdown::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .search-results-dropdown::-webkit-scrollbar-track {
+            background: #f0f0f0;
+        }
+
+        .search-results-dropdown::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 3px;
         }
 
         .search-result-item {
-            padding: 8px 16px;
+            padding: 12px 20px;
             cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+            font-size: 14px;
         }
 
         .search-result-item:hover {
             background-color: #f8f9fa;
+            padding-left: 25px;
         }
 
-        /* Logo image */
-        .header-logo img {
-            height: 40px;
+        .search-result-item.active {
+            background-color: #e9ecef !important;
+            padding-left: 25px !important;
         }
 
-        /* Sidebar toggle in header */
-        .sidebar-toggle {
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-icon {
+            color: var(--accent-color);
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .search-result-text {
+            flex-grow: 1;
+            color: #333;
+        }
+
+        .search-result-text .highlight {
+            background-color: #fff3cd;
+            font-weight: 600;
+        }
+
+        .search-loading,
+        .search-no-results {
+            padding: 20px;
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        /* Mobile hamburger button */
+        .hamburger-btn {
             background: none;
             border: none;
-            color: #f2fce0;
-            font-size: 1.5rem;
-            margin-right: 16px;
+            color: var(--text-color);
+            font-size: 1.8rem;
             cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            margin-right: 15px;
         }
 
-        /* Mobile sidebar */
-        @@media (max-width: 991.98px) {
-            .sidebar {
-                position: fixed;
-                width: 280px;
-                left: -280px;
-                transition: all 0.3s;
-                z-index: 1000;
-            }
-
-            .sidebar.show {
-                left: 0;
-            }
-
-            .header-logo-section,
-            .header-user-section {
-                min-width: auto;
-            }
+        .hamburger-btn:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            transform: scale(1.1);
         }
-        /*
-        .top-navbar {
-            background-color: #AABD8C;
-            height: 60px;
-            width: 100%;
+
+        /* Mobile sidebar overlay */
+        .mobile-sidebar-overlay {
             position: fixed;
             top: 0;
             left: 0;
-            z-index: 1000;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1200;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .mobile-sidebar-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Mobile sidebar */
+        .mobile-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100%;
+            background-color: var(--primary-color);
             background-image: url("https://www.transparenttextures.com/patterns/elegant-grid.png");
+            z-index: 1300;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+            padding-top: var(--header-height);
         }
 
-        .sidebar {
-            margin-top: 60px;
-            min-height: calc(100vh - 60px);
+        .mobile-sidebar.show {
+            transform: translateX(0);
         }
 
-        .content {
-            margin-top: 60px;
-            min-height: calc(100vh - 60px);
+        .mobile-sidebar .nav-link {
+            color: var(--text-color) !important;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            font-size: 16px;
+            padding: 12px 20px;
+            border-radius: 0;
+            transition: background-color 0.2s;
         }
-        */
 
-        
+        .mobile-sidebar .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--accent-color) !important;
+        }
+
+        .mobile-sidebar .dropdown-menu {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: none;
+            box-shadow: none;
+            padding-left: 20px;
+        }
+
+        .mobile-sidebar .dropdown-item {
+            color: var(--text-color) !important;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            padding: 8px 16px;
+        }
+
+        .mobile-sidebar .dropdown-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--accent-color) !important;
+        }
+
+        /* closing button for mobile sidebar */
+        .mobile-sidebar-close {
+            position: absolute;
+            top: 8px;
+            right: 16px;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 8px;
+            z-index: 1;
+        }
+
+        /* styling for desktop and larger screens */
+        @@media (min-width: 992px) {
+            .hamburger-btn {
+                display: none;
+            }
+            
+            .mobile-sidebar-overlay,
+            .mobile-sidebar {
+                display: none;
+            }
+            
+            .sidebar {
+                display: block;
+            }
+
+            .content {
+                margin-left: 250px;
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+
+            .header-logo-section {
+                min-width: 280px;
+            }
+
+            .header-logo img {
+                height: 70px; /* Even bigger on desktop */
+            }
+        }
+
+        /* Tablet and mobile styles */
+        @@media (max-width: 991.98px) and (min-width: 769px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .content {
+                margin-left: 0;
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+
+            .header-logo-section {
+                min-width: auto;
+            }
+
+            .header-logo img {
+                height: 55px;
+            }
+
+            /* Adjust search on smaller screens */
+            .search-container {
+                max-width: 400px;
+                min-width: 250px;
+            }
+        }
+
+        /* Mobile specific adjustments */
+        @@media (max-width: 768px) {
+            .header-logo-section {
+                flex-shrink: 1;
+                min-width: auto;
+            }
+
+            .header-user-section {
+                min-width: auto;
+            }
+
+            .search-container {
+                max-width: 250px;
+                min-width: 180px;
+            }
+
+            .header-logo img {
+                height: 50px;
+            }
+
+            #homepageSearchInput {
+                font-size: 14px;
+                padding: 10px 45px 10px 15px;
+            }
+
+            .search-btn {
+                width: 35px;
+                height: 35px;
+            }
+
+            #clearSearch {
+                right: 40px;
+                font-size: 16px;
+            }
+        }
+
+        /* Very small mobile screens */
+        @@media (max-width: 480px) {
+            .main-header {
+                padding: 0 10px;
+                gap: 10px;
+            }
+
+            .header-logo img {
+                height: 45px;
+            }
+
+            .search-container {
+                min-width: 150px;
+            }
+
+            .header-user-section .btn {
+                font-size: 0.8rem;
+                padding: 0.25rem 0.5rem;
+            }
+        }
+
+        /* Success alert positioning */
+        .alert {
+            margin-top: var(--header-height);
+            margin-bottom: 0;
+            border-radius: 0;
+        }
     </style>
+
 </head>
 
 <body>
-    <!-- Mobile Navbar -->
-    <nav class="navbar navbar-expand-md navbar-light d-md-none"
-         style="background-color: #AABD8C; background-image: url('https://www.transparenttextures.com/patterns/elegant-grid.png');">
-        <div class="container-fluid">
-            <a class="navbar-brand" asp-controller="Home" asp-action="Index">
-                <img src="~/images/StorkDork-NoMascot.svg" alt="Stork Dork" style="height: 40px;" />
-            </a>
-            <button class="navbar-toggler"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#mobileNavbar"
-                    aria-controls="mobileNavbar"
-                    aria-expanded="false"
-                    aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+    <!-- Mobile Sidebar Overlay -->
+    <div class="mobile-sidebar-overlay" id="mobileOverlay"></div>
 
-            <div class="collapse navbar-collapse" id="mobileNavbar">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+    <!-- Mobile Sidebar -->
+    <nav class="mobile-sidebar" id="mobileSidebar">
+        <button class="mobile-sidebar-close" id="closeMobileSidebar">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        
+        <div class="pt-3">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Home" asp-action="Index">
+                        <i class="bi bi-house-door-fill me-2"></i>Home
+                    </a>
+                </li>
+
+                @if (User.Identity.IsAuthenticated)
+                {
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
+                        <a class="nav-link" data-bs-toggle="collapse" href="#mobileBirdLogMenu" role="button">
+                            <i class="bi bi-bookmark-fill me-2"></i>Bird Log
+                            <i class="bi bi-chevron-down float-end"></i>
+                        </a>
+                        <div class="collapse" id="mobileBirdLogMenu">
+                            <ul class="list-unstyled">
+                                <li>
+                                    <a class="nav-link ps-4" asp-controller="BirdLog" asp-action="Index">
+                                        <i class="bi bi-eye-fill me-2"></i>View Logs
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="nav-link ps-4" asp-controller="BirdLog" asp-action="Create">
+                                        <i class="bi bi-plus-circle-fill me-2"></i>Create New Log
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </li>
-                    @if (User.Identity.IsAuthenticated)
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="BirdLog" asp-action="Index">View Logs</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="BirdLog" asp-action="Create">Create Log</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Milestone" asp-action="Index">Milestones</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index">
-                                Profile
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <form method="post"
-                                  asp-area="Identity"
-                                  asp-page="/Account/Logout"
-                                  class="d-inline">
-                                <button type="submit" class="nav-link btn btn-link">Logout</button>
-                            </form>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Checklists" asp-action="Index">
-                                Checklist
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="UserContent" asp-action="MySubmissions">
-                                My Submissions
-                            </a>
-                        </li>
-                    }
-                    else
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="Identity" asp-page="/Account/Login">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="Identity" asp-page="/Account/Register">Register</a>
-                        </li>
-                    }
+
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-controller="Leaflet" asp-action="Map">Map</a>
+                        <a class="nav-link" asp-controller="Checklists" asp-action="Index">
+                            <i class="bi bi-check-square-fill me-2"></i>Checklist
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Milestone" asp-action="Index">
+                            <i class="bi bi-flag-fill me-2"></i>Milestones
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="UserContent" asp-action="MySubmissions">
+                            <i class="bi bi-upload me-2"></i>My Submissions
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="UserSettings" asp-action="Settings">
+                            <i class="bi bi-gear-fill me-2"></i>Settings
+                        </a>
+                    </li>
+                }
+
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Leaflet" asp-action="Map">
+                        <i class="bi bi-map-fill me-2"></i>Map
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Search" asp-action="Index">
+                        <i class="bi bi-binoculars-fill me-2"></i>Search Birds
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="BirdingTips" asp-action="Index">
+                        <i class="bi bi-lightbulb-fill me-2"></i>Birding Tips
+                    </a>
+                </li>
+
+                @if (User.IsInRole("Admin") || User.IsInRole("Moderator"))
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="collapse" href="#mobileModerationMenu" role="button">
+                            <i class="bi bi-shield-check-fill me-2"></i>Moderation
+                            <i class="bi bi-chevron-down float-end"></i>
+                        </a>
+                        <div class="collapse" id="mobileModerationMenu">
+                            <ul class="list-unstyled">
+                                <li>
+                                    <a class="nav-link ps-4" asp-controller="Moderation" asp-action="Index">
+                                        <i class="bi bi-hourglass-split-fill me-2"></i>Pending Queue
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="nav-link ps-4" asp-controller="Moderation" asp-action="History">
+                                        <i class="bi bi-clock-history-fill me-2"></i>History
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                }
+
+                <hr style="border-color: rgba(242, 252, 224, 0.3);" />
+
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="Identity" asp-page="/Account/Manage/Location">
+                            <i class="bi bi-geo-alt-fill me-2"></i>Set Location
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-controller="Search" asp-action="Index">Search Birds</a>
+                        <a class="nav-link" asp-area="Identity" asp-page="/Account/Manage/Index">
+                            <i class="bi bi-person-circle-fill me-2"></i>Profile
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-controller="BirdingTips" asp-action="Index">Birding Tips</a>
+                        <form method="post" asp-area="Identity" asp-page="/Account/Logout">
+                            <button type="submit" class="nav-link btn btn-link w-100 text-start">
+                                <i class="bi bi-box-arrow-right-fill me-2"></i>Logout
+                            </button>
+                        </form>
                     </li>
-                </ul>
-            </div>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="Identity" asp-page="/Account/Login">
+                            <i class="bi bi-box-arrow-in-right-fill me-2"></i>Login
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="Identity" asp-page="/Account/Register">
+                            <i class="bi bi-person-plus-fill me-2"></i>Register
+                        </a>
+                    </li>
+                }
+            </ul>
         </div>
     </nav>
 
@@ -277,63 +687,34 @@
             @TempData["SuccessMessage"]
         </div>
     }
-@* 
-<nav class="top-navbar">
-    <div class="container-fluid h-100">
-        <div class="row h-100 align-items-center">
-            <!-- Navbar content -->
-            <div class="col">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index" 
-                   style="display: flex; align-items: center; height: 100%; padding-left: 1rem;">
-                    <img src="~/images/StorkDork-NoMascot.svg" 
-                         alt="Stork Dork" 
-                         style="height: 40px; width: auto; vertical-align: middle;">
-                </a>
-            </div>
-        </div>
-    </div>
-</nav>
-*@
-
 
     <!-- Main Header -->
     <header class="main-header">
         <div class="header-logo-section">
-            <button class="sidebar-toggle d-lg-none">
+            <!-- Hamburger menu for mobile/tablet -->
+            <button class="hamburger-btn d-lg-none" id="openMobileSidebar">
                 <i class="bi bi-list"></i>
             </button>
-            <a class="navbar-brand"
-               asp-area=""
-               asp-controller="Home"
-               asp-action="Index"
-               style="display: flex; align-items: center; height: 80px;">
-                <img src="~/images/StorkDork-NoMascot.svg"
-                     alt="Stork Dork"
-                     style="height: 150px; width: auto;" />
+            
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index" 
+               style="display: flex; align-items: center;">
+                <img src="~/images/StorkDork-NoMascot.svg" alt="Stork Dork" 
+                     style="height: 120px; width: auto;" />
             </a>
         </div>
 
         <div class="header-search-section">
             <div class="search-container">
-                <form asp-controller="Search"
-                      asp-action="SearchBirds"
-                      method="get"
-                      class="d-flex w-100">
+                <form asp-controller="Search" asp-action="SearchBirds" method="get" class="d-flex w-100">
                     <div class="input-group rounded-pill shadow-sm w-100">
-                        <input type="text"
-                               id="homepageSearchInput"
-                               name="searchTerm"
-                               class="form-control rounded-pill pe-5"
-                               placeholder="Enter bird name..."
-                               autocomplete="off" />
-                        <button id="clearSearch"
-                                type="button"
+                        <input type="text" id="homepageSearchInput" name="searchTerm" 
+                               class="form-control rounded-pill pe-5" placeholder="Enter bird name..." autocomplete="off" />
+                        <button id="clearSearch" type="button" 
                                 class="btn btn-link text-muted position-absolute"
                                 style="right:60px; top:50%; transform:translateY(-50%); display:none; z-index:100;">
                             <i class="bi bi-x-circle"></i>
                         </button>
-                        <button type="submit"
-                                class="input-group-text bg-transparent border-0 position-relative"
+                        <button type="submit" class="input-group-text bg-transparent border-0 position-relative"
                                 style="right:10px;">
                             <i class="bi bi-search"></i>
                         </button>
@@ -348,26 +729,25 @@
             @if (User.Identity.IsAuthenticated)
             {
                 @await Component.InvokeAsync("NotificationsDropdown")
-                <div class="dropdown ms-3">
-                    <button class="btn btn-outline-light dropdown-toggle"
-                            type="button"
-                            id="userDropdown"
-                            data-bs-toggle="dropdown">
+                <div class="dropdown ms-2">
+                    <button class="btn btn-outline-light dropdown-toggle" type="button" 
+                            id="userDropdown" data-bs-toggle="dropdown">
                         <i class="bi bi-person-circle"></i>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                            <a class="dropdown-item"
-                               asp-area="Identity"
-                               asp-page="/Account/Manage/Index">
+                            <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">
                                 Profile
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" asp-controller="UserSettings" asp-action="Settings">
+                                Settings
                             </a>
                         </li>
                         <li><hr class="dropdown-divider" /></li>
                         <li>
-                            <form method="post"
-                                  asp-area="Identity"
-                                  asp-page="/Account/Logout">
+                            <form method="post" asp-area="Identity" asp-page="/Account/Logout">
                                 <button type="submit" class="dropdown-item">Logout</button>
                             </form>
                         </li>
@@ -376,214 +756,379 @@
             }
             else
             {
-                <a class="btn btn-outline-light me-2" asp-area="Identity" asp-page="/Account/Login">Login</a>
-                <a class="btn btn-light" asp-area="Identity" asp-page="/Account/Register">Register</a>
+                <a class="btn btn-outline-light me-2 btn-sm" asp-area="Identity" asp-page="/Account/Login">Login</a>
+                <a class="btn btn-light btn-sm" asp-area="Identity" asp-page="/Account/Register">Register</a>
             }
         </div>
     </header>
 
-    <!-- Sidebar & Main Content -->
-    <div class="container-fluid">
-        <div class="row">
-            <nav class="d-none d-md-block col-md-3 col-lg-2 sidebar">
-                <div class="position-sticky pt-3">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark"
-                               asp-area=""
-                               asp-controller="Home"
-                               asp-action="Index">
-                                <i class="bi bi-house-door-fill me-2"></i>Home
-                            </a>
-                        </li>
+    <!-- Desktop Sidebar - Only shows on large screens -->
+    <nav class="sidebar d-none d-lg-block">
+        <div class="position-sticky pt-3">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">
+                        <i class="bi bi-house-door-fill me-2"></i>Home
+                    </a>
+                </li>
 
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark dropdown-toggle"
-                                   data-bs-toggle="collapse"
-                                   href="#birdLogMenu"
-                                   role="button">
-                                    <i class="bi bi-bookmark-fill me-2"></i>Bird Log
-                                </a>
-                                <div class="collapse" id="birdLogMenu">
-                                    <ul class="list-unstyled ms-4">
-                                        <li>
-                                            <a class="nav-link text-dark"
-                                               asp-controller="BirdLog"
-                                               asp-action="Index">
-                                                <i class="bi bi-eye-fill me-2"></i>View Logs
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="nav-link text-dark"
-                                               asp-controller="BirdLog"
-                                               asp-action="Create">
-                                                <i class="bi bi-plus-circle-fill me-2"></i>Create New Log
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </li>
-                        }
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link text-dark dropdown-toggle" data-bs-toggle="collapse" 
+                           href="#birdLogMenu" role="button">
+                            <i class="bi bi-bookmark-fill me-2"></i>Bird Log
+                        </a>
+                        <div class="collapse" id="birdLogMenu">
+                            <ul class="list-unstyled ms-4">
+                                <li>
+                                    <a class="nav-link text-dark" asp-controller="BirdLog" asp-action="Index">
+                                        <i class="bi bi-eye-fill me-2"></i>View Logs
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="nav-link text-dark" asp-controller="BirdLog" asp-action="Create">
+                                        <i class="bi bi-plus-circle-fill me-2"></i>Create New Log
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                }
 
-                        <li class="nav-item">
-                            <a class="nav-link text-dark"
-                               asp-controller="Leaflet"
-                               asp-action="Map">
-                                <i class="bi bi-map-fill me-2"></i>Map
-                            </a>
-                        </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-controller="Leaflet" asp-action="Map">
+                        <i class="bi bi-map-fill me-2"></i>Map
+                    </a>
+                </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link text-dark"
-                               asp-controller="Search"
-                               asp-action="Index">
-                                <i class="bi bi-binoculars-fill me-2"></i>Search Birds
-                            </a>
-                        </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-controller="Search" asp-action="Index">
+                        <i class="bi bi-binoculars-fill me-2"></i>Search Birds
+                    </a>
+                </li>
 
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark"
-                                   asp-controller="Checklists"
-                                   asp-action="Index">
-                                    <i class="bi bi-check-square-fill me-2"></i>Checklist
-                                </a>
-                            </li>
-                        }
-                        <li class="nav-item"></li>
-                            <a class="nav-link text-dark" asp-controller="BirdingTips" asp-action="Index">
-                                <i class="bi bi-binoculars-fill me-2"></i> Birdings Tips 
-                            </a>
-                        </li>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-controller="Checklists" asp-action="Index">
+                            <i class="bi bi-check-square-fill me-2"></i>Checklist
+                        </a>
+                    </li>
+                }
 
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark"
-                                   asp-controller="Milestone"
-                                   asp-action="Index">
-                                    <i class="bi bi-flag-fill me-2"></i>Milestones
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link"
-                                   asp-controller="UserContent"
-                                   asp-action="MySubmissions">
-                                    <i class="bi bi-upload me-2"></i>My Submissions
-                                </a>
-                            </li>
-                        }
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-controller="Milestone" asp-action="Index">
+                            <i class="bi bi-flag-fill me-2"></i>Milestones
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="UserContent" asp-action="MySubmissions">
+                            <i class="bi bi-upload me-2"></i>My Submissions
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-controller="UserSettings" asp-action="Settings">
+                            <i class="bi bi-gear-fill me-2"></i>Settings
+                        </a>
+                    </li>
+                }
 
-                        <li class="nav-item">
-                            <a class="nav-link text-dark"
-                               asp-controller="BirdingTips"
-                               asp-action="Index">
-                                <i class="bi bi-binoculars-fill me-2"></i>Birding Tips
-                            </a>
-                        </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-controller="BirdingTips" asp-action="Index">
+                        <i class="bi bi-lightbulb-fill me-2"></i>Birding Tips
+                    </a>
+                </li>
 
-                        @if (User.IsInRole("Admin") || User.IsInRole("Moderator"))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark dropdown-toggle"
-                                   data-bs-toggle="collapse"
-                                   href="#moderationMenu"
-                                   role="button">
-                                    <i class="bi bi-shield-check-fill me-2"></i>Moderation
-                                </a>
-                                <div class="collapse" id="moderationMenu">
-                                    <ul class="list-unstyled ms-4">
-                                        <li>
-                                            <a class="nav-link text-dark"
-                                               asp-controller="Moderation"
-                                               asp-action="Index">
-                                                <i class="bi bi-hourglass-split-fill me-2"></i>Pending Queue
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="nav-link text-dark"
-                                               asp-controller="Moderation"
-                                               asp-action="History">
-                                                <i class="bi bi-clock-history-fill me-2"></i>History
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </li>
-                        }
+                @if (User.IsInRole("Admin") || User.IsInRole("Moderator"))
+                {
+                    <li class="nav-item">
+                        <a class="nav-link text-dark dropdown-toggle" data-bs-toggle="collapse" 
+                           href="#moderationMenu" role="button">
+                            <i class="bi bi-shield-check-fill me-2"></i>Moderation
+                        </a>
+                        <div class="collapse" id="moderationMenu">
+                            <ul class="list-unstyled ms-4">
+                                <li>
+                                    <a class="nav-link text-dark" asp-controller="Moderation" asp-action="Index">
+                                        <i class="bi bi-hourglass-split-fill me-2"></i>Pending Queue
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="nav-link text-dark" asp-controller="Moderation" asp-action="History">
+                                        <i class="bi bi-clock-history-fill me-2"></i>History
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                }
 
-                        <hr />
+                <hr />
 
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark"
-                                   asp-area="Identity"
-                                   asp-page="/Account/Manage/Location">
-                                    <i class="bi bi-geo-alt-fill me-2"></i>Set Location
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark"
-                                   asp-area="Identity"
-                                   asp-page="/Account/Manage/Index">
-                                    <i class="bi bi-person-circle-fill me-2"></i>Profile
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <form method="post" asp-area="Identity" asp-page="/Account/Logout">
-                                    <button type="submit"
-                                            class="nav-link btn btn-link text-dark">
-                                        <i class="bi bi-box-arrow-right-fill me-2"></i>Logout
-                                    </button>
-                                </form>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark"
-                                   asp-area="Identity"
-                                   asp-page="/Account/Login">
-                                    <i class="bi bi-box-arrow-in-right-fill me-2"></i>Login
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark"
-                                   asp-area="Identity"
-                                   asp-page="/Account/Register">
-                                    <i class="bi bi-person-plus-fill me-2"></i>Register
-                                </a>
-                            </li>
-                        }
-                    </ul>
-                </div>
-            </nav>
-
-            <main class="col-12 col-md-9 ms-sm-auto col-lg-10 px-md-4 content">
-                @RenderBody()
-            </main>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Location">
+                            <i class="bi bi-geo-alt-fill me-2"></i>Set Location
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index">
+                            <i class="bi bi-person-circle-fill me-2"></i>Profile
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <form method="post" asp-area="Identity" asp-page="/Account/Logout">
+                            <button type="submit" class="nav-link btn btn-link text-dark">
+                                <i class="bi bi-box-arrow-right-fill me-2"></i>Logout
+                            </button>
+                        </form>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">
+                            <i class="bi bi-box-arrow-in-right-fill me-2"></i>Login
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">
+                            <i class="bi bi-person-plus-fill me-2"></i>Register
+                        </a>
+                    </li>
+                }
+            </ul>
         </div>
-    </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="content">
+        @RenderBody()
+    </main>
 
     <!-- JS Libraries -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/notifications.js" asp-append-version="true"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const toggleButton = document.querySelector('.sidebar-toggle');
-            const sidebar = document.querySelector('.sidebar');
             
-            if (toggleButton && sidebar) {
-                toggleButton.addEventListener('click', function() {
-                    sidebar.classList.toggle('show');
-                });
+            const openBtn = document.getElementById('openMobileSidebar');
+            const closeBtn = document.getElementById('closeMobileSidebar');
+            const sidebar = document.getElementById('mobileSidebar');
+            const overlay = document.getElementById('mobileOverlay');
+
+            function openSidebar() {
+                sidebar.classList.add('show');
+                overlay.classList.add('show');
+                document.body.style.overflow = 'hidden';
             }
+
+            function closeSidebar() {
+                sidebar.classList.remove('show');
+                overlay.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+
+            if (openBtn) {
+                openBtn.addEventListener('click', openSidebar);
+            }
+
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeSidebar);
+            }
+
+            if (overlay) {
+                overlay.addEventListener('click', closeSidebar);
+            }
+
+            
+            const mobileNavLinks = sidebar.querySelectorAll('.nav-link:not([data-bs-toggle])');
+            mobileNavLinks.forEach(link => {
+                link.addEventListener('click', closeSidebar);
+            });
+
+            
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 992) {
+                    closeSidebar();
+                }
+            });
+
+            
+            const DEBOUNCE_DELAY = 300;
+            const searchInput = document.getElementById('homepageSearchInput');
+            const searchDropdown = document.getElementById('searchResultsDropdown');
+            const clearButton = document.getElementById('clearSearch');
+            
+            let searchTimeout = null;
+            let currentFocus = -1;
+
+            class HeaderSearchHandler {
+                constructor() {
+                    this.initializeEventListeners();
+                }
+
+                initializeEventListeners() {
+                    if (!searchInput || !searchDropdown) return;
+
+                    
+                    searchInput.addEventListener('input', (e) => this.handleInput(e));
+                    
+                    
+                    searchInput.addEventListener('keydown', (e) => this.handleKeyDown(e));
+                    
+                    
+                    if (clearButton) {
+                        clearButton.addEventListener('click', () => this.clearSearch());
+                    }
+                    
+                    
+                    document.addEventListener('click', (e) => {
+                        if (!e.target.closest('.search-container')) {
+                            this.hideDropdown();
+                        }
+                    });
+
+                    
+                    searchInput.addEventListener('input', () => {
+                        if (clearButton) {
+                            clearButton.style.display = searchInput.value.trim() ? 'block' : 'none';
+                        }
+                    });
+                }
+
+                handleInput(event) {
+                    clearTimeout(searchTimeout);
+                    const searchTerm = event.target.value.trim();
+                    
+                    if (searchTerm.length < 2) {
+                        this.hideDropdown();
+                        return;
+                    }
+                    
+                    searchTimeout = setTimeout(() => {
+                        this.performSearch(searchTerm);
+                    }, DEBOUNCE_DELAY);
+                }
+
+                handleKeyDown(event) {
+                    const items = searchDropdown.querySelectorAll('.search-result-item');
+                    
+                    if (event.key === 'ArrowDown') {
+                        event.preventDefault();
+                        currentFocus = Math.min(currentFocus + 1, items.length - 1);
+                        this.updateFocus(items);
+                    } else if (event.key === 'ArrowUp') {
+                        event.preventDefault();
+                        currentFocus = Math.max(currentFocus - 1, -1);
+                        this.updateFocus(items);
+                    } else if (event.key === 'Enter') {
+                        event.preventDefault();
+                        if (currentFocus >= 0 && items[currentFocus]) {
+                            items[currentFocus].click();
+                        } else {
+                            
+                            searchInput.closest('form').submit();
+                        }
+                    } else if (event.key === 'Escape') {
+                        this.hideDropdown();
+                        searchInput.blur();
+                    }
+                }
+
+                updateFocus(items) {
+                    items.forEach((item, index) => {
+                        item.classList.toggle('active', index === currentFocus);
+                    });
+                }
+
+                async performSearch(searchTerm) {
+                    try {
+                        
+                        searchDropdown.innerHTML = '<div class="search-loading">Searching...</div>';
+                        searchDropdown.style.display = 'block';
+                        
+                        const response = await fetch(`/search/preview?searchTerm=${encodeURIComponent(searchTerm)}&searchType=name`);
+                        
+                        if (!response.ok) {
+                            throw new Error('Search failed');
+                        }
+                        
+                        const data = await response.json();
+                        
+                        if (!data || data.length === 0) {
+                            searchDropdown.innerHTML = '<div class="search-no-results">No birds found</div>';
+                            return;
+                        }
+                        
+                        this.displayResults(data, searchTerm);
+                        currentFocus = -1; 
+                        
+                    } catch (error) {
+                        console.error('Search error:', error);
+                        searchDropdown.innerHTML = '<div class="search-no-results">Search unavailable</div>';
+                    }
+                }
+
+                displayResults(birds, searchTerm) {
+                    const resultsHTML = birds.map(bird => {
+                        
+                        const highlightedName = this.highlightMatch(bird.commonName, searchTerm);
+                        const highlightedScientific = this.highlightMatch(bird.scientificName, searchTerm);
+                        
+                        return `
+                            <div class="search-result-item" onclick="headerSearch.selectBird(${bird.id})">
+                                <i class="search-result-icon bi bi-search"></i>
+                                <div class="search-result-text">
+                                    <div>${highlightedName}</div>
+                                    <div class="scientific-name">${highlightedScientific}</div>
+                                    <div class="taxonomy-info text-muted small">
+                                        ${bird.order} | ${bird.familyCommonName}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    searchDropdown.innerHTML = resultsHTML;
+                    searchDropdown.style.display = 'block';
+                }
+
+                highlightMatch(text, searchTerm) {
+                    if (!text || !searchTerm) return text;
+                    
+                    const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+                    return text.replace(regex, '<span class="highlight">$1</span>');
+                }
+
+                selectBird(birdId) {
+                    window.location.href = `/Bird/Details/${birdId}`;
+                }
+
+                clearSearch() {
+                    searchInput.value = '';
+                    this.hideDropdown();
+                    searchInput.focus();
+                    if (clearButton) {
+                        clearButton.style.display = 'none';
+                    }
+                }
+
+                hideDropdown() {
+                    searchDropdown.style.display = 'none';
+                    currentFocus = -1;
+                }
+            }
+
+            
+            window.headerSearch = new HeaderSearchHandler();
         });
     </script>
 
@@ -609,6 +1154,7 @@
                 document.getElementById(`${type}-validation`).classList.add('d-none');
             }
         </script>
+    }
     }
 </body>
 </html>
