@@ -48,7 +48,7 @@
         }
 
         /* desktop sidebar styling */
-        .sidebar {
+                .sidebar {
             background-color: var(--primary-color);
             background-image: url("https://www.transparenttextures.com/patterns/elegant-grid.png");
             font-family: 'Darumadrop One', sans-serif;
@@ -59,7 +59,7 @@
             top: var(--header-height);
             left: 0;
             width: 250px;
-            z-index: 1000;
+            z-index: 1100; /* CHANGED FROM 50 TO 1100 */
             overflow-y: auto;
         }
 
@@ -98,7 +98,7 @@
             top: 0;
             left: 0;
             right: 0;
-            z-index: 1050;
+            z-index: 100; 
             display: flex;
             align-items: center;
             padding: 0 20px;
@@ -233,7 +233,7 @@
             border-top: none;
             border-radius: 0 0 12px 12px;
             box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-            z-index: 1000;
+            z-index: 1300; /* CHANGED FROM 1000 TO 1300 */
             display: none;
             max-height: 400px;
             overflow-y: auto;
@@ -330,7 +330,7 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1200;
+            z-index: 200; 
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -350,12 +350,13 @@
             height: 100%;
             background-color: var(--primary-color);
             background-image: url("https://www.transparenttextures.com/patterns/elegant-grid.png");
-            z-index: 1300;
+            z-index: 300; 
             transform: translateX(-100%);
             transition: transform 0.3s ease;
             overflow-y: auto;
             padding-top: var(--header-height);
         }
+
 
         .mobile-sidebar.show {
             transform: translateX(0);
@@ -425,9 +426,9 @@
             }
 
             .content {
-                margin-left: 250px;
-                padding-left: 20px;
-                padding-right: 20px;
+                padding: 1rem;
+                margin-top: var(--header-height);
+                min-height: calc(100vh - var(--header-height));
             }
 
             .header-logo-section {
@@ -528,7 +529,142 @@
             margin-top: var(--header-height);
             margin-bottom: 0;
             border-radius: 0;
+            z-index: 1050;
+            position: relative; 
         }
+        .map-page .content {
+            padding: 0; 
+            margin-top: var(--header-height);
+            height: calc(100vh - var(--header-height)); 
+        }
+
+        
+
+
+/* Desktop sidebar - increased from 50 to 1100 */
+.sidebar {
+    background-color: var(--primary-color);
+    background-image: url("https://www.transparenttextures.com/patterns/elegant-grid.png");
+    font-family: 'Darumadrop One', sans-serif;
+    min-height: calc(100vh - var(--header-height));
+    border-right: 1px solid var(--text-color);
+    font-size: 18px;
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    width: 250px;
+    z-index: 1100; /* CHANGED FROM 50 TO 1100 */
+    overflow-y: auto;
+}
+
+
+.main-header {
+    background-color: var(--primary-color);
+    background-image: url("https://www.transparenttextures.com/patterns/elegant-grid.png");
+    height: var(--header-height);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1200; 
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Search results dropdown - needs high z-index too */
+.search-results-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    z-index: 1300; /* CHANGED FROM 1000 TO 1300 */
+    display: none;
+    max-height: 400px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-color) #f0f0f0;
+}
+
+/* Mobile sidebar overlay - increased from 200 to 1400 */
+        .mobile-sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1400; /* CHANGED FROM 200 TO 1400 */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+/* Mobile sidebar - increased from 300 to 1500 */
+        .mobile-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100%;
+            background-color: var(--primary-color);
+            background-image: url("https://www.transparenttextures.com/patterns/elegant-grid.png");
+            z-index: 1500; /* CHANGED FROM 300 TO 1500 */
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+            padding-top: var(--header-height);
+        }
+
+        
+        .map-page #map {
+            width: 100%;
+            height: 100%;
+            min-height: calc(100vh - var(--header-height));
+            position: relative; 
+            z-index: 1; 
+        }
+
+        /* CHANGE 3: Desktop responsive adjustments for map */
+        @@media (min-width: 992px) {
+            .hamburger-btn {
+                display: none;
+            }
+            
+            .mobile-sidebar-overlay,
+            .mobile-sidebar {
+                display: none;
+            }
+            
+            .sidebar {
+                display: block;
+            }
+
+            .content {
+                margin-left: 250px;
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+
+            .map-page .content {
+                margin-left: 250px;
+                padding: 0; /* No padding for map */
+            }
+
+            .header-logo-section {
+                min-width: 280px;
+            }
+
+            .header-logo img {
+                height: 70px;
+            }
     </style>
 
 </head>
@@ -927,13 +1063,21 @@
             function openSidebar() {
                 sidebar.classList.add('show');
                 overlay.classList.add('show');
-                document.body.style.overflow = 'hidden';
+                
+                // NEW: Don't set overflow hidden on map pages
+                if (!document.body.classList.contains('map-page')) {
+                    document.body.style.overflow = 'hidden';
+                }
             }
 
             function closeSidebar() {
                 sidebar.classList.remove('show');
                 overlay.classList.remove('show');
-                document.body.style.overflow = '';
+                
+                // NEW: Only restore overflow if it was changed
+                if (!document.body.classList.contains('map-page')) {
+                    document.body.style.overflow = '';
+                }
             }
 
             if (openBtn) {
