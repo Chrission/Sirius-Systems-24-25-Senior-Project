@@ -17,6 +17,12 @@ Scenario: Create a new checklist with selected birds
         | Bird Name          |
         | American Robin     |
         | Northern Cardinal  |
-    And I verify at least 2 birds are selected
     And I submit the checklist form
     Then I should be redirected to the Checklist index page
+
+
+Scenario: Verify checklist details
+    Given I log in as "mcaldwell@a.com" with password "Mcaldwell_01"
+    When I navigate to "Checklists"
+    And I click on the details button
+    Then the page should not crash

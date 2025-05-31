@@ -53,7 +53,7 @@
             </a>
         </div>
 
-        <!-- Community Card -->
+        <!-- Community Card-->
         <div class="col-md-4">
             <a class="full-image-card" style="background-image: url('/images/cards/community-image.svg');">
                 <div class="card-overlay">
@@ -62,7 +62,7 @@
                     <span class="card-button">View Details</span>
                 </div>
             </a>
-        </div>
+        </div> 
     </div>
 </section>
 
@@ -210,22 +210,25 @@
     .full-image-banner {
         min-height: 300px;
     }
-    
+
     .banner-content {
         width: 100%;
         background: rgba(233, 227, 180, 0.9);
         position: relative;
         padding: 1.5rem;
     }
-    
+
     .full-image-card {
-        height: 200px;
+        height: 250px;
+        background-size: contain; /* Show full image */
+        background-repeat: no-repeat;
+        background-position: center top;
     }
-    
+
     .card-overlay {
         padding: 1rem;
     }
-    
+
     .card-title {
         font-size: 1.1rem;
     }
@@ -233,7 +236,7 @@
 
 @@media (max-width: 576px) {
     .full-image-card {
-        max-width: 400px;
+        max-width: 100%;
         margin: 0 auto;
     }
     
